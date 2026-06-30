@@ -1,4 +1,38 @@
-# Project Demo Maximo
+<!-- BANNIÈRE -->
+<p align="center">
+<img src="docs/screenshots/banner-architecture.png" alt="Architecture multi-agents WatsonX Orchestrate x Maximo" width="100%">
+</p>
+<h1 align="center">WatsonX Orchestrate × Maximo — Multi-Agent Demo</h1>
+<p align="center">
+<strong>Une démo concrète d'IA agentique pour la maintenance industrielle.<br>
+  Un assistant. Quatre systèmes. Zéro silo.</strong>
+</p>
+<!-- BADGES -->
+<p align="center">
+<img src="https://img.shields.io/badge/version-1.0.0-blue.svg" alt="Version">
+<img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License">
+<img src="https://img.shields.io/badge/python-3.12+-blue.svg" alt="Python">
+<img src="https://img.shields.io/badge/IBM-WatsonX_Orchestrate-052FAD.svg?logo=ibm&logoColor=white" alt="IBM WatsonX Orchestrate">
+<img src="https://img.shields.io/badge/IBM-Maximo-052FAD.svg?logo=ibm&logoColor=white" alt="IBM Maximo">
+<img src="https://img.shields.io/badge/ServiceNow-grey?logo=servicenow&logoColor=white" alt="ServiceNow">
+<img src="https://img.shields.io/badge/Slack-4A154B?logo=slack&logoColor=white" alt="Slack">
+</p>
+<!-- CTA VIDÉO -->
+<p align="center">
+<a href="https://youtu.be/5qgKqxjqO4A">
+<img src="https://img.shields.io/badge/▶️_Watch_Demo_on_YouTube-red?style=for-the-badge&logo=youtube&logoColor=white" alt="Watch demo on YouTube" height="50">
+</a>
+  &nbsp;&nbsp;
+  <a href="https://www.linkedin.com/in/estepa/">
+<img src="https://img.shields.io/badge/💬_Discuss_on_LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="Discuss on LinkedIn" height="50">
+</a>
+</p>
+<!-- GIF DÉMO -->
+<p align="center">
+<img src="docs/screenshots/cascade-slack.gif" alt="Cascade automatique ServiceNow vers Slack" width="800">
+<br>
+<em>La cascade automatique : à la clôture du ticket ServiceNow, l'orchestrateur déclenche la notification Slack — sans intervention humaine.</em>
+</p>
 
 Projet de démonstration watsonx Orchestrate autour d'un parcours multi-agents de maintenance industrielle.
 
@@ -36,15 +70,15 @@ Une **architecture multi-agents** où :
                   │   (point d'entrée)      │
                   └────────────┬────────────┘
                                │
-        ┌──────────────┬───────┴───────┬──────────────┬──────────────┐
-        ▼              ▼               ▼              ▼              ▼
+        ┌──────────────┬───────┴───────┬─────────────┬─────────────┐
+        ▼              ▼               ▼             ▼             ▼
   ┌──────────┐  ┌─────────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐
   │ServiceNow│  │  Maximo     │  │  Maximo  │  │  Stock   │  │  Slack   │
   │   ITSM   │  │ Diagnostic  │  │ Planning │  │ (Supabase│  │ Notifier │
   │  Agent   │  │   Agent     │  │  Agent   │  │  Agent)  │  │  Agent   │
   └────┬─────┘  └──────┬──────┘  └─────┬────┘  └────┬─────┘  └─────┬────┘
-       │               │                │            │              │
-       ▼               ▼                ▼            ▼              ▼
+       │               │               │            │              │
+       ▼               ▼               ▼            ▼              ▼
   ┌──────────┐  ┌─────────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐
   │ServiceNow│  │   Maximo    │  │  Maximo  │  │ Supabase │  │  Slack   │
   │   REST   │  │   OSLC      │  │   OSLC   │  │   REST   │  │ Webhook  │
