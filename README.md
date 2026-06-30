@@ -91,11 +91,11 @@ Une **architecture multi-agents** où :
 
 ### 1. Préparer l'environnement
 
-- créer un fichier local `.env.sdk` à partir de [`.env.sdk.exemple`](.env.sdk.exemple)
+- créer un fichier local [`.env.sdk`](.env.sdk.exemple) à partir de [`.env.sdk.exemple`](.env.sdk.exemple)
 - configurer les accès nécessaires pour Maximo, ServiceNow, Supabase et Slack
 - activer votre environnement watsonx Orchestrate
 
-### Variables à modifier dans [`.env.sdk`](.env.sdk)
+### Variables à modifier dans [`.env.sdk`](.env.sdk.exemple)
 
 Avant d'exécuter les scripts, la personne qui installe le projet doit remplacer les valeurs d'exemple par ses propres informations.
 
@@ -158,22 +158,6 @@ L'URL Maximo utilisée dans [`connections/maximo_conn.yaml`](connections/maximo_
 - [`docs/README_SERVICENOW.md`](docs/README_SERVICENOW.md)
 - [`docs/README_STOCK.md`](docs/README_STOCK.md)
 - [`docs/README_SUPABASE.md`](docs/README_SUPABASE.md)
-
-### Organisation recommandée à moyen terme
-
-Pour un dépôt Git plus lisible, tu peux garder [`README.md`](README.md) comme point d'entrée principal et, plus tard, déplacer les guides détaillés de la racine vers un futur dossier `docs/`.
-
-Ce n'est pas obligatoire avant le premier commit, mais c'est une bonne évolution si la documentation continue de grossir.
-
-
-## Recommandation Git
-
-Avant le premier commit :
-- vérifier que [`.env.sdk`](.env.sdk) n'est pas versionné
-- vérifier que [`venv/`](venv/) et [`bin/`](bin/) ne sont pas versionnés
-- relire les README pour éviter de publier des informations sensibles ou obsolètes
-
-Le fichier [`.gitignore`](.gitignore) a été ajouté pour couvrir les fichiers locaux et artefacts courants.
 
 ## 🎥 Ressources externes
 
