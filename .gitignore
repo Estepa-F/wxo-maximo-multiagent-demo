@@ -1,0 +1,26 @@
+.DS_Store
+.env.sdk
+.env
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.python-version
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+coverage/
+htmlcov/
+.bob/
+.vscode/
+.idea/
+*.log
+sandbox/
+
+# Local CLI/runtime artifacts
+bin/
+
+# OS artifacts
+Thumbs.db

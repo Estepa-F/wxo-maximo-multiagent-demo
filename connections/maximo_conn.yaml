@@ -1,0 +1,12 @@
+spec_version: v1
+kind: connection
+app_id: maximo_conn
+environments:
+  draft:
+    kind: api_key
+    type: team
+    server_url: https://mas.manage.mas.apps.itz-5yeawx.infra01-lb.dal14.techzone.ibm.com/maximo
+  live:
+    kind: api_key
+    type: team
+    server_url: https://mas.manage.mas.apps.itz-5yeawx.infra01-lb.dal14.techzone.ibm.com/maximo

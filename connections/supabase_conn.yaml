@@ -1,0 +1,11 @@
+spec_version: v1
+kind: connection
+app_id: supabase_conn
+environments:
+  draft:
+    kind: key_value
+    type: team
+  live:
+    kind: key_value
+    type: team
+
