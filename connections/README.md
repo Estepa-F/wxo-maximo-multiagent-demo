@@ -23,7 +23,7 @@ Définit la connexion vers IBM Maximo.
 Elle sert à :
 - déclarer l'URL du serveur Maximo
 - configurer une authentification de type API key
-- fournir la base de connexion utilisée par [`maximo_tools.py`](../tools/maximo_tools.py:1)
+- fournir la base de connexion utilisée par [`maximo_tools.py`](../tools/maximo_tools.py)
 
 ### [`servicenow_conn.yaml`](servicenow_conn.yaml)
 Définit la connexion vers ServiceNow.
@@ -31,7 +31,7 @@ Définit la connexion vers ServiceNow.
 Elle sert à :
 - déclarer l'URL de l'instance ServiceNow
 - configurer une authentification OAuth password flow
-- fournir la connexion utilisée par [`servicenow_tools.py`](../tools/servicenow_tools.py:1)
+- fournir la connexion utilisée par [`servicenow_tools.py`](../tools/servicenow_tools.py)
 
 ### [`slack_conn.yaml`](slack_conn.yaml)
 Définit la connexion vers Slack.
@@ -39,7 +39,7 @@ Définit la connexion vers Slack.
 Elle sert à :
 - stocker les variables nécessaires à l'envoi de notifications
 - configurer une connexion de type key/value
-- fournir la configuration utilisée par [`slack_tools.py`](../tools/slack_tools.py:1)
+- fournir la configuration utilisée par [`slack_tools.py`](../tools/slack_tools.py)
 
 ### [`supabase_conn.yaml`](supabase_conn.yaml)
 Définit la connexion vers Supabase.
@@ -47,7 +47,7 @@ Définit la connexion vers Supabase.
 Elle sert à :
 - stocker l'URL et la clé d'accès Supabase
 - configurer une connexion de type key/value
-- fournir la configuration utilisée par [`supabase_tools.py`](../tools/supabase_tools.py:1)
+- fournir la configuration utilisée par [`supabase_tools.py`](../tools/supabase_tools.py)
 
 ## En pratique
 
