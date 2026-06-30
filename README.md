@@ -8,6 +8,50 @@ Le projet combine plusieurs systèmes :
 - Supabase pour le stock de pièces
 - Slack pour les notifications d'équipe
 
+## 🎯 Le problème
+
+Dans un site industriel, traiter un incident de maintenance demande au manager de jongler entre **4 systèmes minimum** :
+
+- 🎫 **ServiceNow** pour le ticket d'incident
+- 🔧 **IBM Maximo** pour la gestion d'actifs et les work orders
+- 📦 **ERP** pour vérifier le stock et passer les commandes
+- 💬 **Slack** pour notifier l'équipe d'astreinte
+
+Résultat : **20 minutes minimum par incident**, des erreurs de saisie, des oublis de notification, et zéro traçabilité unifiée.
+
+## 💡 La solution
+
+Une **architecture multi-agents** où :
+
+- **L'utilisateur parle à un seul orchestrateur** dans une conversation naturelle
+- L'**orchestrateur délègue** chaque tâche à un agent spécialisé sur un système
+- Toute **écriture passe par un protocole propose / confirm** — l'humain reste dans la boucle
+- Les **effets de bord** (notifications) sont déclenchés **automatiquement** par les tools eux-mêmes via un pattern de tools chaining déclaratif
+
+## 🏗️ Architecture
+
+```
+                  ┌─────────────────────────┐
+                  │   maximo_orchestrator   │
+                  │   (point d'entrée)      │
+                  └────────────┬────────────┘
+                               │
+        ┌──────────────┬───────┴───────┬──────────────┬──────────────┐
+        ▼              ▼               ▼              ▼              ▼
+  ┌──────────┐  ┌─────────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐
+  │ServiceNow│  │  Maximo     │  │  Maximo  │  │  Stock   │  │  Slack   │
+  │   ITSM   │  │ Diagnostic  │  │ Planning │  │ (Supabase│  │ Notifier │
+  │  Agent   │  │   Agent     │  │  Agent   │  │  Agent)  │  │  Agent   │
+  └────┬─────┘  └──────┬──────┘  └─────┬────┘  └────┬─────┘  └─────┬────┘
+       │               │                │            │              │
+       ▼               ▼                ▼            ▼              ▼
+  ┌──────────┐  ┌─────────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐
+  │ServiceNow│  │   Maximo    │  │  Maximo  │  │ Supabase │  │  Slack   │
+  │   REST   │  │   OSLC      │  │   OSLC   │  │   REST   │  │ Webhook  │
+  │  OAuth2  │  │  API Key    │  │ API Key  │  │ API Key  │  │   URL    │
+  └──────────┘  └─────────────┘  └──────────┘  └──────────┘  └──────────┘
+```
+
 ## Structure du projet
 
 - [`agents/`](agents/) : définitions des agents Orchestrate
