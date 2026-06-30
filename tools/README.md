@@ -17,7 +17,7 @@ En pratique, les agents ne parlent pas directement aux APIs : ils appellent les 
 
 ## Fichiers présents dans ce dossier
 
-### [`maximo_tools.py`](tools/maximo_tools.py)
+### [`maximo_tools.py`](maximo_tools.py)
 Implémente les tools pour IBM Maximo.
 
 Il sert à :
@@ -28,7 +28,7 @@ Il sert à :
 - extraire le texte d'une pièce jointe
 - proposer puis créer une work order
 
-### [`servicenow_tools.py`](tools/servicenow_tools.py)
+### [`servicenow_tools.py`](servicenow_tools.py)
 Implémente les tools pour ServiceNow.
 
 Il sert à :
@@ -37,7 +37,7 @@ Il sert à :
 - préparer une mise à jour d'incident
 - appliquer une mise à jour après confirmation
 
-### [`supabase_tools.py`](tools/supabase_tools.py)
+### [`supabase_tools.py`](supabase_tools.py)
 Implémente les tools pour le stock et les commandes fournisseur via Supabase.
 
 Il sert à :
@@ -46,19 +46,19 @@ Il sert à :
 - consulter l'historique des commandes
 - proposer puis créer une commande fournisseur
 
-### [`slack_tools.py`](tools/slack_tools.py)
+### [`slack_tools.py`](slack_tools.py)
 Implémente les tools de notification Slack.
 
 Il sert à :
 - envoyer un message simple
 - envoyer un récapitulatif formaté de fin de traitement
 
-### [`requirements.txt`](tools/requirements.txt)
+### [`requirements.txt`](requirements.txt)
 Liste les dépendances Python nécessaires pour exécuter ces intégrations.
 
 ## En pratique
 
-Le dossier [`tools/`](tools/) regroupe donc la couche d'intégration technique du projet. Chaque fichier y définit des fonctions exposées comme tools Orchestrate, avec leurs schémas d'entrée et de sortie, leurs appels API et leurs règles d'usage.
+Ce dossier regroupe donc la couche d'intégration technique du projet. Chaque fichier y définit des fonctions exposées comme tools Orchestrate, avec leurs schémas d'entrée et de sortie, leurs appels API et leurs règles d'usage.
 
 Cette organisation permet de séparer clairement :
 - la logique conversationnelle dans les agents

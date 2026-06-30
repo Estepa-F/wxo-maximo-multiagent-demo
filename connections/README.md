@@ -17,41 +17,41 @@ En pratique, les tools lisent ces connexions via watsonx Orchestrate pour appele
 
 ## Fichiers présents dans ce dossier
 
-### [`maximo_conn.yaml`](connections/maximo_conn.yaml)
+### [`maximo_conn.yaml`](maximo_conn.yaml)
 Définit la connexion vers IBM Maximo.
 
 Elle sert à :
 - déclarer l'URL du serveur Maximo
 - configurer une authentification de type API key
-- fournir la base de connexion utilisée par [`maximo_tools.py`](tools/maximo_tools.py:1)
+- fournir la base de connexion utilisée par [`maximo_tools.py`](../tools/maximo_tools.py:1)
 
-### [`servicenow_conn.yaml`](connections/servicenow_conn.yaml)
+### [`servicenow_conn.yaml`](servicenow_conn.yaml)
 Définit la connexion vers ServiceNow.
 
 Elle sert à :
 - déclarer l'URL de l'instance ServiceNow
 - configurer une authentification OAuth password flow
-- fournir la connexion utilisée par [`servicenow_tools.py`](tools/servicenow_tools.py:1)
+- fournir la connexion utilisée par [`servicenow_tools.py`](../tools/servicenow_tools.py:1)
 
-### [`slack_conn.yaml`](connections/slack_conn.yaml)
+### [`slack_conn.yaml`](slack_conn.yaml)
 Définit la connexion vers Slack.
 
 Elle sert à :
 - stocker les variables nécessaires à l'envoi de notifications
 - configurer une connexion de type key/value
-- fournir la configuration utilisée par [`slack_tools.py`](tools/slack_tools.py:1)
+- fournir la configuration utilisée par [`slack_tools.py`](../tools/slack_tools.py:1)
 
-### [`supabase_conn.yaml`](connections/supabase_conn.yaml)
+### [`supabase_conn.yaml`](supabase_conn.yaml)
 Définit la connexion vers Supabase.
 
 Elle sert à :
 - stocker l'URL et la clé d'accès Supabase
 - configurer une connexion de type key/value
-- fournir la configuration utilisée par [`supabase_tools.py`](tools/supabase_tools.py:1)
+- fournir la configuration utilisée par [`supabase_tools.py`](../tools/supabase_tools.py:1)
 
 ## En pratique
 
-Le dossier [`connections/`](connections/) regroupe donc la configuration d'accès aux services externes du projet. Chaque fichier YAML définit un `app_id`, un type de connexion et les environnements disponibles, généralement `draft` et `live`.
+Ce dossier regroupe donc la configuration d'accès aux services externes du projet. Chaque fichier YAML définit un `app_id`, un type de connexion et les environnements disponibles, généralement `draft` et `live`.
 
 Cette organisation permet de séparer clairement :
 - les secrets et paramètres d'accès dans les connexions

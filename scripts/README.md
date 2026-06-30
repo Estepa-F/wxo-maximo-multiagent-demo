@@ -15,38 +15,38 @@ Les scripts permettent notamment de :
 
 ## Fichiers présents dans ce dossier
 
-### [`configure_maximo_connection.sh`](scripts/configure_maximo_connection.sh)
+### [`configure_maximo_connection.sh`](configure_maximo_connection.sh)
 Configure la connexion Maximo dans watsonx Orchestrate.
 
-### [`configure_servicenow_connection.sh`](scripts/configure_servicenow_connection.sh)
+### [`configure_servicenow_connection.sh`](configure_servicenow_connection.sh)
 Configure la connexion ServiceNow dans watsonx Orchestrate.
 
-### [`configure_supabase_connection.sh`](scripts/configure_supabase_connection.sh)
+### [`configure_supabase_connection.sh`](configure_supabase_connection.sh)
 Configure la connexion Supabase dans watsonx Orchestrate.
 
-### [`create_connections.sh`](scripts/create_connections.sh)
+### [`create_connections.sh`](create_connections.sh)
 Importe puis configure l'ensemble des connexions du projet.
 
-### [`reimport_maximo_tools.sh`](scripts/reimport_maximo_tools.sh)
+### [`reimport_maximo_tools.sh`](reimport_maximo_tools.sh)
 Réimporte les tools Maximo avec la bonne connexion.
 
-### [`import_supabase_tools.sh`](scripts/import_supabase_tools.sh)
+### [`import_supabase_tools.sh`](import_supabase_tools.sh)
 Importe les tools Supabase.
 
-### [`import_all_agents.sh`](scripts/import_all_agents.sh)
+### [`import_all_agents.sh`](import_all_agents.sh)
 Importe les agents principaux du projet dans le bon ordre.
 
-### [`deploy_complete.sh`](scripts/deploy_complete.sh)
+### [`deploy_complete.sh`](deploy_complete.sh)
 Lance le déploiement complet du projet : connexions, tools et agents.
 
 ## En pratique
 
-Le dossier [`scripts/`](scripts/) regroupe donc la couche d'automatisation opérationnelle du projet. Ces scripts s'appuient principalement sur le CLI `orchestrate` pour exécuter les tâches de configuration et de déploiement.
+Ce dossier regroupe donc la couche d'automatisation opérationnelle du projet. Ces scripts s'appuient principalement sur le CLI `orchestrate` pour exécuter les tâches de configuration et de déploiement.
 
 Cette organisation permet de séparer clairement :
-- la configuration d'accès dans [`connections/`](connections/)
-- la logique technique d'intégration dans [`tools/`](tools/)
-- la logique conversationnelle dans [`agents/`](agents/)
-- l'automatisation des opérations dans [`scripts/`](scripts/)
+- la configuration d'accès dans [`connections/`](../connections/)
+- la logique technique d'intégration dans [`tools/`](../tools/)
+- la logique conversationnelle dans [`agents/`](../agents/)
+- l'automatisation des opérations dans ce dossier
 
 Le résultat est un projet plus simple à installer, plus cohérent à déployer et plus facile à maintenir.

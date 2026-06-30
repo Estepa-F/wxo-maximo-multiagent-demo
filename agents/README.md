@@ -16,7 +16,7 @@ Dans ce projet, un agent orchestrateur reçoit la demande utilisateur puis dél�
 
 ## Agents présents dans ce dossier
 
-### [`maximo_orchestrator.yaml`](agents/maximo_orchestrator.yaml)
+### [`maximo_orchestrator.yaml`](maximo_orchestrator.yaml)
 Agent principal exposé à l'utilisateur.
 
 Il sert à :
@@ -25,7 +25,7 @@ Il sert à :
 - conserver la logique globale du workflow
 - enchaîner les actions entre plusieurs systèmes quand c'est nécessaire
 
-### [`maximo_diagnostic_agent.yaml`](agents/maximo_diagnostic_agent.yaml)
+### [`maximo_diagnostic_agent.yaml`](maximo_diagnostic_agent.yaml)
 Agent de consultation Maximo en lecture seule.
 
 Il sert à :
@@ -35,7 +35,7 @@ Il sert à :
 - lister et lire les documents attachés
 - aider au diagnostic avant une action
 
-### [`maximo_planning_agent.yaml`](agents/maximo_planning_agent.yaml)
+### [`maximo_planning_agent.yaml`](maximo_planning_agent.yaml)
 Agent de création d'interventions dans Maximo.
 
 Il sert à :
@@ -43,7 +43,7 @@ Il sert à :
 - présenter un résumé avant validation
 - créer la work order après confirmation explicite
 
-### [`maximo_stock_agent.yaml`](agents/maximo_stock_agent.yaml)
+### [`maximo_stock_agent.yaml`](maximo_stock_agent.yaml)
 Agent dédié au stock de pièces détachées.
 
 Il sert à :
@@ -52,7 +52,7 @@ Il sert à :
 - proposer une commande fournisseur
 - créer la commande après confirmation
 
-### [`servicenow_ITSM_agent.yaml`](agents/servicenow_ITSM_agent.yaml)
+### [`servicenow_ITSM_agent.yaml`](servicenow_ITSM_agent.yaml)
 Agent dédié aux tickets ServiceNow.
 
 Il sert à :
@@ -61,7 +61,7 @@ Il sert à :
 - ajouter des work notes
 - résoudre un incident avec un résumé de clôture
 
-### [`slack_notifier_agent.yaml`](agents/slack_notifier_agent.yaml)
+### [`slack_notifier_agent.yaml`](slack_notifier_agent.yaml)
 Agent de notification Slack.
 
 Il sert à :
@@ -70,7 +70,7 @@ Il sert à :
 
 ## En pratique
 
-Le dossier [`agents/`](agents/) regroupe donc les comportements IA du projet. Chaque fichier YAML définit :
+Ce dossier regroupe donc les comportements IA du projet. Chaque fichier YAML définit :
 - le nom de l'agent
 - sa description
 - ses instructions

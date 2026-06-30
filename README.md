@@ -183,7 +183,7 @@ in the Software without restriction [...]
 ## 🙏 Crédits
 
 Construit avec :
-- [IBM WatsonX Orchestrate](https://www.ibm.com/products/watsonx-orchestrate) et son [ADK Python](https://developer.watson-orchestrate.ibm.com/)
+- [IBM WatsonX Orchestrate](https://www.ibm.com/products/watsonx-orchestrate) et son [ADK](https://developer.watson-orchestrate.ibm.com/)
 - [IBM Maximo Application Suite](https://www.ibm.com/products/maximo)
 - [ServiceNow Developer PDI](https://developer.servicenow.com/)
 - [Supabase](https://supabase.com/) pour la couche ERP démo
