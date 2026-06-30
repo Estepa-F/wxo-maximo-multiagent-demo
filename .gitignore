@@ -19,6 +19,8 @@ htmlcov/
 *.log
 sandbox/
 
+Makefile
+
 # Local CLI/runtime artifacts
 bin/
 
