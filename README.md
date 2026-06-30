@@ -1,7 +1,3 @@
-<!-- BANNIÈRE -->
-<p align="center">
-<img src="docs/screenshots/banner-architecture.png" alt="Architecture multi-agents WatsonX Orchestrate x Maximo" width="100%">
-</p>
 <h1 align="center">WatsonX Orchestrate × Maximo — Multi-Agent Demo</h1>
 <p align="center">
 <strong>Une démo concrète d'IA agentique pour la maintenance industrielle.<br>
@@ -29,8 +25,6 @@
 </p>
 <!-- GIF DÉMO -->
 <p align="center">
-<img src="docs/screenshots/cascade-slack.gif" alt="Cascade automatique ServiceNow vers Slack" width="800">
-<br>
 <em>La cascade automatique : à la clôture du ticket ServiceNow, l'orchestrateur déclenche la notification Slack — sans intervention humaine.</em>
 </p>
 
@@ -97,7 +91,7 @@ Une **architecture multi-agents** où :
 
 ### 1. Préparer l'environnement
 
-- créer un fichier local [`.env.sdk`](.env.sdk) à partir de [`.env.sdk.exemple`](.env.sdk.exemple)
+- créer un fichier local `.env.sdk` à partir de [`.env.sdk.exemple`](.env.sdk.exemple)
 - configurer les accès nécessaires pour Maximo, ServiceNow, Supabase et Slack
 - activer votre environnement watsonx Orchestrate
 
@@ -180,3 +174,37 @@ Avant le premier commit :
 - relire les README pour éviter de publier des informations sensibles ou obsolètes
 
 Le fichier [`.gitignore`](.gitignore) a été ajouté pour couvrir les fichiers locaux et artefacts courants.
+
+## 🎥 Ressources externes
+
+- 🎬 [Vidéo démo complète sur YouTube](https://youtu.be/5qgKqxjqO4A)
+- 💼 [Profil LinkedIn](https://www.linkedin.com/in/estepa/)
+
+## ⚖️ Licence
+
+Ce projet est distribué sous licence MIT. Voir [LICENSE](LICENSE) pour les détails.
+
+```
+MIT License
+Copyright (c) 2026 François Estepa
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction [...]
+```
+
+## 🙏 Crédits
+
+Construit avec :
+- [IBM WatsonX Orchestrate](https://www.ibm.com/products/watsonx-orchestrate) et son [ADK Python](https://developer.watson-orchestrate.ibm.com/)
+- [IBM Maximo Application Suite](https://www.ibm.com/products/maximo)
+- [ServiceNow Developer PDI](https://developer.servicenow.com/)
+- [Supabase](https://supabase.com/) pour la couche ERP démo
+- [Slack Incoming Webhooks](https://api.slack.com/messaging/webhooks)
+
+---
+
+<p align="center">
+  ⭐ Si ce projet vous a inspiré, mettez une étoile au repo. Ça aide d'autres architectes à le trouver.<br>
+  💬 Questions ? Ouvrez une issue ou contactez-moi via <a href="https://www.linkedin.com/in/estepa/">LinkedIn</a>.
+</p>
