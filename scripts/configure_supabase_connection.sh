@@ -25,12 +25,18 @@ fi
 # Variables
 APP_ID="supabase_conn"
 CONNECTION_FILE="connections/supabase_conn.yaml"
-SUPABASE_URL="https://oxzfsrzgvgpuwhqhkihs.supabase.co"
-SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im94emZzcnpndmdwdXdocWhraWhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzODM2NTYsImV4cCI6MjA5NTk1OTY1Nn0.RvNO7yCM9M2Pdf0ZJFzw59p9Y2ZnupGeqORHh8AecWU"
+SUPABASE_URL="${SUPABASE_URL:-}"
+SUPABASE_KEY="${SUPABASE_KEY:-}"
+
+if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_KEY" ]; then
+    echo "❌ Variables Supabase manquantes"
+    echo "Veuillez définir SUPABASE_URL et SUPABASE_KEY dans .env.sdk"
+    exit 1
+fi
 
 echo "📝 Configuration Supabase :"
 echo "   URL : $SUPABASE_URL"
-echo "   ANON KEY : ${SUPABASE_ANON_KEY:0:20}..."
+echo "   KEY : ${SUPABASE_KEY:0:20}..."
 echo ""
 
 echo "=========================================="
@@ -65,7 +71,7 @@ echo "=========================================="
 orchestrate connections set-credentials \
     --app-id "$APP_ID" \
     --environment draft \
-    --api-key "$SUPABASE_ANON_KEY"
+    --api-key "$SUPABASE_KEY"
 
 echo "✅ Credentials draft définis"
 
@@ -93,7 +99,7 @@ echo "=========================================="
 orchestrate connections set-credentials \
     --app-id "$APP_ID" \
     --environment live \
-    --api-key "$SUPABASE_ANON_KEY"
+    --api-key "$SUPABASE_KEY"
 
 echo "✅ Credentials live définis"
 

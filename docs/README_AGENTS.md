@@ -329,5 +329,5 @@ Bot: ✅ Work order créée : WO-1235
 ## Ressources
 
 - [Documentation watsonx Orchestrate](https://developer.watson-orchestrate.ibm.com/)
-- [Guide des connexions](README_CONNECTION.md)
-- [Guide de réimportation des outils](README_REIMPORT_TOOLS.md)
+- [Guide des connexions](docs/README_CONNECTION.md)
+- [Guide de réimportation des outils](docs/README_REIMPORT_TOOLS.md)

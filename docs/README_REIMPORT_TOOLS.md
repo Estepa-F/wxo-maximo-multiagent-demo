@@ -22,7 +22,7 @@ apikey = conn.api_key
 
 ## Prérequis
 
-1. La connexion `maximo_conn` doit être configurée (voir [`README_CONNECTION.md`](README_CONNECTION.md:1))
+1. La connexion `maximo_conn` doit être configurée (voir [`README_CONNECTION.md`](docs/README_CONNECTION.md:1))
 2. Vos credentials Maximo (URL et clé API) doivent être définis dans la connexion
 
 ## Méthode 1 : Script Automatique (Recommandé)
@@ -251,4 +251,4 @@ orchestrate tools test --name TOOL_NAME
 
 - [Documentation des outils Python](https://developer.watson-orchestrate.ibm.com/tools/create_python_tool)
 - [Documentation des connexions](https://developer.watson-orchestrate.ibm.com/connections/overview)
-- [Guide de configuration de la connexion](README_CONNECTION.md)
+- [Guide de configuration de la connexion](docs/README_CONNECTION.md)

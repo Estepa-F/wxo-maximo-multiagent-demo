@@ -23,6 +23,34 @@ Le projet combine plusieurs systèmes :
 - configurer les accès nécessaires pour Maximo, ServiceNow, Supabase et Slack
 - activer votre environnement watsonx Orchestrate
 
+### Variables à modifier dans [`.env.sdk`](.env.sdk)
+
+Avant d'exécuter les scripts, la personne qui installe le projet doit remplacer les valeurs d'exemple par ses propres informations.
+
+#### watsonx Orchestrate
+- `WO_INSTANCE_ALIAS` : alias local de l'environnement watsonx Orchestrate
+- `WO_INSTANCE` : URL de l'instance watsonx Orchestrate
+- `WO_API_KEY` : clé API watsonx Orchestrate
+
+#### Maximo
+- `MAXIMO_API_KEY` : clé API Maximo
+
+L'URL Maximo utilisée dans [`connections/maximo_conn.yaml`](connections/maximo_conn.yaml:1) est un placeholder public et doit être adaptée à l'instance cible au moment de la configuration.
+
+#### ServiceNow
+- `SN_INSTANCE_URL` : URL de l'instance ServiceNow
+- `SN_USERNAME` : identifiant du compte de service
+- `SN_PASSWORD` : mot de passe du compte de service
+- `SN_CLIENT_ID` : identifiant OAuth
+- `SN_CLIENT_SECRET` : secret OAuth
+
+#### Supabase
+- `SUPABASE_URL` : URL du projet Supabase
+- `SUPABASE_KEY` : clé API Supabase utilisée par les scripts de configuration
+
+#### Slack
+- `SLACK_WEBHOOK_URL` : URL du webhook Slack utilisé pour les notifications
+
 ### 2. Déployer le projet
 
 ```bash
@@ -47,17 +75,17 @@ Le projet combine plusieurs systèmes :
 - [`connections/README.md`](connections/README.md)
 - [`scripts/README.md`](scripts/README.md)
 
-### Guides détaillés conservés à la racine
+### Guides détaillés dans [`docs/`](docs/)
 
-- [`README_AGENTS.md`](README_AGENTS.md)
-- [`README_CONNECTION.md`](README_CONNECTION.md)
-- [`README_DEPLOY.md`](README_DEPLOY.md)
-- [`README_MAXIMO.md`](README_MAXIMO.md)
-- [`README_REIMPORT_TOOLS.md`](README_REIMPORT_TOOLS.md)
-- [`README_SCRIPTS.md`](README_SCRIPTS.md)
-- [`README_SERVICENOW.md`](README_SERVICENOW.md)
-- [`README_STOCK.md`](README_STOCK.md)
-- [`README_SUPABASE.md`](README_SUPABASE.md)
+- [`docs/README_AGENTS.md`](docs/README_AGENTS.md)
+- [`docs/README_CONNECTION.md`](docs/README_CONNECTION.md)
+- [`docs/README_DEPLOY.md`](docs/README_DEPLOY.md)
+- [`docs/README_MAXIMO.md`](docs/README_MAXIMO.md)
+- [`docs/README_REIMPORT_TOOLS.md`](docs/README_REIMPORT_TOOLS.md)
+- [`docs/README_SCRIPTS.md`](docs/README_SCRIPTS.md)
+- [`docs/README_SERVICENOW.md`](docs/README_SERVICENOW.md)
+- [`docs/README_STOCK.md`](docs/README_STOCK.md)
+- [`docs/README_SUPABASE.md`](docs/README_SUPABASE.md)
 
 ### Organisation recommandée à moyen terme
 

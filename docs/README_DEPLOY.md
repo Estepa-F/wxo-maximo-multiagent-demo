@@ -308,10 +308,10 @@ cat tools/requirements.txt
 
 ## 📚 Documentation
 
-- **README_CONNECTION.md** : Guide des connexions
-- **README_AGENTS.md** : Architecture multi-agents
-- **README_STOCK.md** : Agent de gestion du stock
-- **README_SUPABASE.md** : Configuration Supabase
+- [`README_CONNECTION.md`](docs/README_CONNECTION.md) : Guide des connexions
+- [`README_AGENTS.md`](docs/README_AGENTS.md) : Architecture multi-agents
+- [`README_STOCK.md`](docs/README_STOCK.md) : Agent de gestion du stock
+- [`README_SUPABASE.md`](docs/README_SUPABASE.md) : Configuration Supabase
 
 ## 🎯 Prochaines étapes
 

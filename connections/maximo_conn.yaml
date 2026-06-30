@@ -5,8 +5,8 @@ environments:
   draft:
     kind: api_key
     type: team
-    server_url: https://mas.manage.mas.apps.itz-5yeawx.infra01-lb.dal14.techzone.ibm.com/maximo
+    server_url: https://your-maximo-instance/maximo
   live:
     kind: api_key
     type: team
-    server_url: https://mas.manage.mas.apps.itz-5yeawx.infra01-lb.dal14.techzone.ibm.com/maximo
+    server_url: https://your-maximo-instance/maximo

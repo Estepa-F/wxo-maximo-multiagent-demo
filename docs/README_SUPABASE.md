@@ -13,8 +13,8 @@ Supabase est une alternative open-source à Firebase qui fournit :
 
 ## Informations de connexion
 
-- **URL** : `https://oxzfsrzgvgpuwhqhkihs.supabase.co`
-- **ANON KEY** : Clé API publique pour l'accès client
+- **URL** : `https://your-project.supabase.co`
+- **ANON KEY** : Clé API publique pour l'accès client, à fournir via [`.env.sdk`](.env.sdk)
 - **Type de connexion** : `api_key` (la clé ANON KEY est utilisée comme API key)
 
 ## Configuration
@@ -27,8 +27,9 @@ Supabase est une alternative open-source à Firebase qui fournit :
 
 Le script va :
 1. Importer la connexion depuis [`connections/supabase_conn.yaml`](connections/supabase_conn.yaml:1)
-2. Configurer les environnements `draft` et `live`
-3. Définir les credentials (ANON KEY)
+2. Lire `SUPABASE_URL` et `SUPABASE_KEY` depuis [`.env.sdk`](.env.sdk)
+3. Configurer les environnements `draft` et `live`
+4. Définir les credentials
 
 ### Méthode 2 : Configuration manuelle
 
@@ -46,7 +47,7 @@ orchestrate connections configure \
     --environment draft \
     --type team \
     --kind api_key \
-    --server-url https://oxzfsrzgvgpuwhqhkihs.supabase.co
+    --server-url https://your-project.supabase.co
 ```
 
 #### Étape 3 : Définir les credentials pour draft
@@ -55,7 +56,7 @@ orchestrate connections configure \
 orchestrate connections set-credentials \
     --app-id supabase_conn \
     --environment draft \
-    --api-key "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im94emZzcnpndmdwdXdocWhraWhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzODM2NTYsImV4cCI6MjA5NTk1OTY1Nn0.RvNO7yCM9M2Pdf0ZJFzw59p9Y2ZnupGeqORHh8AecWU"
+    --api-key "your-supabase-anon-key"
 ```
 
 #### Étape 4 : Répéter pour l'environnement live
@@ -66,12 +67,12 @@ orchestrate connections configure \
     --environment live \
     --type team \
     --kind api_key \
-    --server-url https://oxzfsrzgvgpuwhqhkihs.supabase.co
+    --server-url https://your-project.supabase.co
 
 orchestrate connections set-credentials \
     --app-id supabase_conn \
     --environment live \
-    --api-key "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im94emZzcnpndmdwdXdocWhraWhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzODM2NTYsImV4cCI6MjA5NTk1OTY1Nn0.RvNO7yCM9M2Pdf0ZJFzw59p9Y2ZnupGeqORHh8AecWU"
+    --api-key "your-supabase-anon-key"
 ```
 
 ## Vérification
@@ -148,7 +149,7 @@ orchestrate tools import \
 
 ### Endpoints disponibles
 
-Avec l'URL de base `https://oxzfsrzgvgpuwhqhkihs.supabase.co` :
+Avec l'URL de base `https://your-project.supabase.co` :
 
 - **REST API** : `/rest/v1/{table_name}`
 - **Auth** : `/auth/v1/`
@@ -161,7 +162,7 @@ Avec l'URL de base `https://oxzfsrzgvgpuwhqhkihs.supabase.co` :
 
 ```bash
 curl -X GET \
-  "https://oxzfsrzgvgpuwhqhkihs.supabase.co/rest/v1/your_table?limit=10" \
+  "https://your-project.supabase.co/rest/v1/your_table?limit=10" \
   -H "apikey: YOUR_ANON_KEY" \
   -H "Authorization: Bearer YOUR_ANON_KEY"
 ```
@@ -170,7 +171,7 @@ curl -X GET \
 
 ```bash
 curl -X POST \
-  "https://oxzfsrzgvgpuwhqhkihs.supabase.co/rest/v1/your_table" \
+  "https://your-project.supabase.co/rest/v1/your_table" \
   -H "apikey: YOUR_ANON_KEY" \
   -H "Authorization: Bearer YOUR_ANON_KEY" \
   -H "Content-Type: application/json" \
@@ -181,7 +182,7 @@ curl -X POST \
 
 ```bash
 curl -X PATCH \
-  "https://oxzfsrzgvgpuwhqhkihs.supabase.co/rest/v1/your_table?id=eq.1" \
+  "https://your-project.supabase.co/rest/v1/your_table?id=eq.1" \
   -H "apikey: YOUR_ANON_KEY" \
   -H "Authorization: Bearer YOUR_ANON_KEY" \
   -H "Content-Type: application/json" \
@@ -192,7 +193,7 @@ curl -X PATCH \
 
 ```bash
 curl -X DELETE \
-  "https://oxzfsrzgvgpuwhqhkihs.supabase.co/rest/v1/your_table?id=eq.1" \
+  "https://your-project.supabase.co/rest/v1/your_table?id=eq.1" \
   -H "apikey: YOUR_ANON_KEY" \
   -H "Authorization: Bearer YOUR_ANON_KEY"
 ```
@@ -246,7 +247,7 @@ Vérifiez que :
 - [Documentation Supabase](https://supabase.com/docs)
 - [API REST Supabase](https://supabase.com/docs/guides/api)
 - [Row Level Security](https://supabase.com/docs/guides/auth/row-level-security)
-- [Guide des connexions watsonx Orchestrate](README_CONNECTION.md)
+- [Guide des connexions watsonx Orchestrate](docs/README_CONNECTION.md)
 
 ## Fichiers
 
