@@ -1,6 +1,9 @@
 spec_version: v1
 kind: connection
 app_id: maximo_conn
+# Note: cette URL est un placeholder public. Les scripts de configuration
+# utilisent la variable MAXIMO_URL depuis .env.sdk pour définir la vraie
+# valeur en draft/live.
 environments:
   draft:
     kind: api_key

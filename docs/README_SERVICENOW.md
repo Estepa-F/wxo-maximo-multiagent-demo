@@ -58,6 +58,7 @@ Assurez-vous que votre compte de service a les rôles nécessaires :
 
 Le script va :
 - Importer la connexion depuis `connections/servicenow_conn.yaml`
+- Utiliser `SN_INSTANCE_URL` depuis `.env.sdk` (ou la demander si absente)
 - Configurer les environnements draft et live avec OAuth 2.0 Password Grant
 - Définir les credentials pour les deux environnements
 

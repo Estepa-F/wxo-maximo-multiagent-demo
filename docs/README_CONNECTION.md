@@ -20,6 +20,8 @@ Le script vous demandera :
 1. L'URL de votre API Maximo
 2. Votre clé API Maximo
 
+Alternative : le script global [`scripts/create_connections.sh`](scripts/create_connections.sh:1) peut utiliser `MAXIMO_URL` et `MAXIMO_API_KEY` depuis `.env.sdk`.
+
 Il configurera automatiquement la connexion pour les environnements `draft` et `live`.
 
 ## Méthode 2 : Configuration Manuelle
@@ -28,7 +30,7 @@ Si vous préférez configurer manuellement, suivez ces étapes :
 
 ### Étape 1 : Mettre à jour le fichier de connexion
 
-Éditez `connections/maximo_conn.yaml` et remplacez `YOUR_MAXIMO_URL_HERE` par votre URL Maximo :
+Éditez `connections/maximo_conn.yaml` et remplacez le placeholder par votre URL Maximo :
 
 ```yaml
 spec_version: v1

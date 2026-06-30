@@ -91,13 +91,13 @@ Une **architecture multi-agents** où :
 
 ### 1. Préparer l'environnement
 
-- créer un fichier local [`.env.sdk`](.env.sdk.exemple) à partir de [`.env.sdk.exemple`](.env.sdk.exemple)
+- créer un fichier local `.env.sdk` à partir de [`.env.sdk.exemple`](.env.sdk.exemple)
 - configurer les accès nécessaires pour Maximo, ServiceNow, Supabase et Slack
 - activer votre environnement watsonx Orchestrate
 
-### Variables à modifier dans [`.env.sdk`](.env.sdk.exemple)
+### Variables à modifier dans [`.env.sdk.exemple`](.env.sdk.exemple)
 
-Avant d'exécuter les scripts, la personne qui installe le projet doit remplacer les valeurs d'exemple par ses propres informations.
+Avant d'exécuter les scripts, la personne qui installe le projet doit créer son propre fichier local `.env.sdk` à partir de [`.env.sdk.exemple`](.env.sdk.exemple) puis remplacer les valeurs d'exemple par ses propres informations.
 
 #### watsonx Orchestrate
 - `WO_INSTANCE_ALIAS` : alias local de l'environnement watsonx Orchestrate
@@ -105,9 +105,10 @@ Avant d'exécuter les scripts, la personne qui installe le projet doit remplacer
 - `WO_API_KEY` : clé API watsonx Orchestrate
 
 #### Maximo
+- `MAXIMO_URL` : URL de l'instance Maximo
 - `MAXIMO_API_KEY` : clé API Maximo
 
-L'URL Maximo utilisée dans [`connections/maximo_conn.yaml`](connections/maximo_conn.yaml:1) est un placeholder public et doit être adaptée à l'instance cible au moment de la configuration.
+Les scripts utilisent `MAXIMO_URL` depuis le fichier local `.env.sdk`. La valeur présente dans [`connections/maximo_conn.yaml`](connections/maximo_conn.yaml) reste un placeholder public utilisé pour l'import initial.
 
 #### ServiceNow
 - `SN_INSTANCE_URL` : URL de l'instance ServiceNow
@@ -115,6 +116,8 @@ L'URL Maximo utilisée dans [`connections/maximo_conn.yaml`](connections/maximo_
 - `SN_PASSWORD` : mot de passe du compte de service
 - `SN_CLIENT_ID` : identifiant OAuth
 - `SN_CLIENT_SECRET` : secret OAuth
+
+Les scripts utilisent `SN_INSTANCE_URL` depuis le fichier local `.env.sdk`. La valeur présente dans [`connections/servicenow_conn.yaml`](connections/servicenow_conn.yaml) reste un placeholder public utilisé pour l'import initial.
 
 #### Supabase
 - `SUPABASE_URL` : URL du projet Supabase

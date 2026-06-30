@@ -1,6 +1,9 @@
 app_id: servicenow_conn
 spec_version: v1
 kind: connection
+# Note: cette URL est un placeholder public. Les scripts de configuration
+# utilisent la variable SN_INSTANCE_URL depuis .env.sdk pour définir la
+# vraie valeur en draft/live.
 environments:
   draft:
     server_url: https://dev123456.service-now.com

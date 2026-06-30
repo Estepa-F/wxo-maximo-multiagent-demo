@@ -35,17 +35,23 @@ if [ -f "$ROOT/connections/maximo_conn.yaml" ]; then
   if [ -f "$ROOT/.env.sdk" ]; then
     source "$ROOT/.env.sdk"
     
-    # Configure for both draft and live environments
-    for env in draft live; do
-      "$ORCH" connections configure -a maximo_conn --env $env -t team -k api_key
-      "$ORCH" connections set-credentials -a maximo_conn --env $env --api-key "${MAXIMO_API_KEY}"
-    done
-    
-    echo "✅ Maximo connection configured for draft and live with credentials from .env.sdk"
+    if [ -z "${MAXIMO_URL:-}" ] || [ -z "${MAXIMO_API_KEY:-}" ]; then
+      echo "⚠️  MAXIMO_URL ou MAXIMO_API_KEY manquant dans .env.sdk"
+      echo "  Configurez ces variables puis relancez le script"
+    else
+      # Configure for both draft and live environments
+      for env in draft live; do
+        "$ORCH" connections configure -a maximo_conn --env $env -t team -k api_key --url "${MAXIMO_URL}"
+        "$ORCH" connections set-credentials -a maximo_conn --env $env --api-key "${MAXIMO_API_KEY}"
+      done
+      
+      echo "✅ Maximo connection configured for draft and live with credentials from .env.sdk"
+    fi
   else
     "$ORCH" connections configure -a maximo_conn --env draft -t team -k api_key
-    echo "⚠️  .env.sdk not found. Remember to set Maximo credentials with:"
-    echo "  orchestrate connections set-credentials -a maximo_conn --env draft --api-key YOUR_API_KEY"
+    echo "⚠️  .env.sdk not found. Remember to set Maximo configuration with:"
+    echo "  MAXIMO_URL=https://your-maximo-instance/maximo"
+    echo "  MAXIMO_API_KEY=your-maximo-api-key"
   fi
 fi
 
