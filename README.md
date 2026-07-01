@@ -152,15 +152,12 @@ Les scripts utilisent `SN_INSTANCE_URL` depuis le fichier local `.env.sdk`. La v
 
 ### Guides détaillés dans [`docs/`](docs/)
 
-- [`docs/README_AGENTS.md`](docs/README_AGENTS.md)
-- [`docs/README_CONNECTION.md`](docs/README_CONNECTION.md)
-- [`docs/README_DEPLOY.md`](docs/README_DEPLOY.md)
-- [`docs/README_MAXIMO.md`](docs/README_MAXIMO.md)
-- [`docs/README_REIMPORT_TOOLS.md`](docs/README_REIMPORT_TOOLS.md)
-- [`docs/README_SCRIPTS.md`](docs/README_SCRIPTS.md)
-- [`docs/README_SERVICENOW.md`](docs/README_SERVICENOW.md)
-- [`docs/README_STOCK.md`](docs/README_STOCK.md)
-- [`docs/README_SUPABASE.md`](docs/README_SUPABASE.md)
+- [`docs/installation.md`](docs/installation.md) — guide d'installation et de déploiement du projet
+- [`docs/architecture.md`](docs/architecture.md) — architecture multi-agents et vue d'ensemble des systèmes
+- [`docs/connections.md`](docs/connections.md) — configuration des connexions Maximo, ServiceNow, Supabase et Slack
+- [`docs/patterns.md`](docs/patterns.md) — patterns architecturaux utilisés dans le projet
+- [`docs/scenario-demo.md`](docs/scenario-demo.md) — scénario de démonstration complet
+- [`docs/maximo_wxo_deck.pptx`](docs/maximo_wxo_deck.pptx) — support de présentation
 
 ## 🎥 Ressources externes
 
