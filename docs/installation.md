@@ -1,54 +1,54 @@
-# Guide d'installation et de déploiement
+# Installation and deployment guide
 
-Ce guide explique comment déployer l'architecture complète du projet dans WatsonX Orchestrate, depuis l'environnement vide jusqu'à la conversation fonctionnelle avec l'orchestrateur.
+This guide explains how to deploy the project's complete architecture in WatsonX Orchestrate, from an empty environment to a working conversation with the orchestrator.
 
-## Prérequis
+## Prerequisites
 
-- IBM WatsonX Orchestrate (instance entreprise ou compte développeur)
+- IBM WatsonX Orchestrate (enterprise instance or developer account)
 - Python 3.12+
-- Accès aux 4 systèmes externes : ServiceNow, IBM Maximo, Supabase, Slack
-- Repo cloné en local
+- Access to the 4 external systems: ServiceNow, IBM Maximo, Supabase, Slack
+- Repo cloned locally
 
-## Vue d'ensemble du déploiement
+## Deployment overview
 
-Le déploiement se fait en 4 étapes, dans cet ordre **impératif** :
+Deployment happens in 4 steps, in this **mandatory** order:
 
 ```
-1. Connections    →  Authentification vers les 4 systèmes externes
-2. Tools          →  Code Python publié dans WXO, lié à une connection
-3. Agents         →  Définitions YAML des 6 agents, importées dans WXO
-4. Test           →  Validation par conversation avec l'orchestrateur
+1. Connections    →  Authentication to the 4 external systems
+2. Tools          →  Python code published to WXO, bound to a connection
+3. Agents         →  YAML definitions of the 6 agents, imported into WXO
+4. Test           →  Validation by conversing with the orchestrator
 ```
 
-Chaque étape dépend de la précédente : un tool ne peut être importé qu'une fois sa connection prête, et un agent ne peut être importé qu'une fois ses tools disponibles.
+Each step depends on the previous one: a tool can only be imported once its connection is ready, and an agent can only be imported once its tools are available.
 
-## Étape 0 — Préparation de l'environnement
+## Step 0 — Environment preparation
 
 ```bash
-# 1. Cloner le repo
+# 1. Clone the repo
 git clone https://github.com/Estepa-F/wxo-maximo-multiagent-demo.git
 cd wxo-maximo-multiagent-demo
 
-# 2. Créer un environnement Python virtuel
+# 2. Create a Python virtual environment
 python3 -m venv venv
 source venv/bin/activate  # macOS/Linux
 # .\venv\Scripts\activate.ps1  # Windows
 
-# 3. Installer le SDK Orchestrate
+# 3. Install the Orchestrate SDK
 pip install ibm-watsonx-orchestrate
 
-# 4. Configurer l'environnement Orchestrate
-orchestrate env add -n production -u <votre-url-wxo> --activate
+# 4. Configure the Orchestrate environment
+orchestrate env add -n production -u <your-wxo-url> --activate
 orchestrate env activate production
 
-# 5. Préparer le fichier de variables
+# 5. Prepare the variables file
 cp .env.sdk.exemple .env.sdk
-# Éditer .env.sdk avec ses propres credentials (cf. connections.md)
+# Edit .env.sdk with your own credentials (see connections.md)
 ```
 
-## Étape 1 — Connections
+## Step 1 — Connections
 
-Le détail complet de chaque connection est dans [`connections.md`](connections.md). Pour un déploiement rapide, lancer les 4 scripts :
+Full details for each connection are in [`connections.md`](connections.md). For a quick deployment, run the 4 scripts:
 
 ```bash
 ./scripts/configure_maximo_connection.sh
@@ -57,31 +57,31 @@ Le détail complet de chaque connection est dans [`connections.md`](connections.
 ./scripts/configure_slack_connection.sh
 ```
 
-Chaque script lit les valeurs nécessaires depuis `.env.sdk` et configure la connection pour l'environnement `draft`.
+Each script reads the required values from `.env.sdk` and configures the connection for the `draft` environment.
 
-**Vérification** :
+**Verification**:
 
 ```bash
 orchestrate connections list
 ```
 
-Doit afficher les 4 connections avec leurs types respectifs :
+Should show the 4 connections with their respective types:
 
 ```
-maximo_conn       api_key                        draft   Connexion à l'API Maximo
-servicenow_conn   oauth_auth_password_flow       draft   Connexion ServiceNow OAuth
-supabase_conn     api_key                        draft   Connexion à l'inventaire Supabase
-slack_conn        api_key                        draft   Connexion Slack webhook
+maximo_conn       api_key                        draft   Connection to the Maximo API
+servicenow_conn   oauth_auth_password_flow       draft   ServiceNow OAuth connection
+supabase_conn     api_key                        draft   Connection to the Supabase inventory
+slack_conn        api_key                        draft   Slack webhook connection
 ```
 
-## Étape 2 — Tools Python
+## Step 2 — Python tools
 
-Quatre modules Python exposent les opérations métier vers les systèmes externes. Chaque module est lié à sa connection respective via le paramètre `--app-id`.
+Four Python modules expose the business operations to the external systems. Each module is bound to its respective connection via the `--app-id` parameter.
 
-### Import des 4 modules
+### Importing the 4 modules
 
 ```bash
-# Tools Maximo (7 outils : search_assets, get_work_orders, get_worklogs,
+# Maximo tools (7 tools: search_assets, get_work_orders, get_worklogs,
 # list_attachments, get_attachment_text, propose_work_order, create_work_order)
 orchestrate tools import \
   -k python \
@@ -89,7 +89,7 @@ orchestrate tools import \
   -r tools/requirements.txt \
   --app-id maximo_conn
 
-# Tools ServiceNow (4 outils : get_incident, list_open_incidents,
+# ServiceNow tools (4 tools: get_incident, list_open_incidents,
 # propose_incident_update, update_incident)
 orchestrate tools import \
   -k python \
@@ -97,7 +97,7 @@ orchestrate tools import \
   -r tools/requirements.txt \
   --app-id servicenow_conn
 
-# Tools Supabase / ERP stock (5 outils : get_spare_part, list_low_stock_parts,
+# Supabase / inventory ERP tools (5 tools: get_spare_part, list_low_stock_parts,
 # list_orders_for_part, propose_supplier_order, create_supplier_order)
 orchestrate tools import \
   -k python \
@@ -105,7 +105,7 @@ orchestrate tools import \
   -r tools/requirements.txt \
   --app-id supabase_conn
 
-# Tools Slack (1 outil : send_incident_summary)
+# Slack tools (1 tool: send_incident_summary)
 orchestrate tools import \
   -k python \
   -f tools/slack_tools.py \
@@ -113,51 +113,51 @@ orchestrate tools import \
   --app-id slack_conn
 ```
 
-### Vérification
+### Verification
 
 ```bash
 orchestrate tools list
 ```
 
-Doit afficher au total **17 tools** répartis sur les 4 modules.
+Should show a total of **17 tools** across the 4 modules.
 
-### Reimport après modification
+### Re-importing after a change
 
-Si on modifie un fichier `tools/*.py`, il suffit de relancer la commande d'import. Orchestrate écrase la version précédente sans demande de confirmation.
+If you modify a `tools/*.py` file, just rerun the import command. Orchestrate overwrites the previous version without asking for confirmation.
 
 ```bash
-./scripts/reimport_maximo_tools.sh   # raccourci pour Maximo
+./scripts/reimport_maximo_tools.sh   # shortcut for Maximo
 ```
 
-## Étape 3 — Agents
+## Step 3 — Agents
 
-Les 6 agents sont importés **dans un ordre précis** : d'abord les collaborateurs, ensuite l'orchestrateur qui les référence.
+The 6 agents are imported **in a specific order**: the collaborators first, then the orchestrator that references them.
 
 ```bash
-# 1. Importer les 5 agents spécialistes
+# 1. Import the 5 specialist agents
 orchestrate agents import -f agents/servicenow_ITSM_agent.yaml
 orchestrate agents import -f agents/maximo_diagnostic_agent.yaml
 orchestrate agents import -f agents/maximo_planning_agent.yaml
 orchestrate agents import -f agents/maximo_stock_agent.yaml
 orchestrate agents import -f agents/slack_notifier_agent.yaml
 
-# 2. Importer l'orchestrateur (qui référence les 5 ci-dessus)
+# 2. Import the orchestrator (which references the 5 above)
 orchestrate agents import -f agents/maximo_orchestrator.yaml
 ```
 
-Ou via le script :
+Or via the script:
 
 ```bash
 ./scripts/import_all_agents.sh
 ```
 
-### Vérification
+### Verification
 
 ```bash
 orchestrate agents list | grep -E "(maximo|servicenow|slack)"
 ```
 
-Doit afficher les 6 agents :
+Should show the 6 agents:
 
 ```
 maximo_orchestrator         native    groq/openai/gpt-oss-120b
@@ -168,85 +168,85 @@ maximo_stock_agent          native    groq/openai/gpt-oss-120b
 slack_notifier_agent        native    groq/openai/gpt-oss-120b
 ```
 
-## Déploiement automatique tout-en-un
+## All-in-one automated deployment
 
-Pour un déploiement complet en une seule commande (connections + tools + agents) :
+For a complete deployment in a single command (connections + tools + agents):
 
 ```bash
 ./scripts/deploy_complete.sh
 ```
 
-Ce script effectue les étapes 1, 2 et 3 dans l'ordre, en lisant les credentials depuis `.env.sdk`.
+This script performs steps 1, 2 and 3 in order, reading the credentials from `.env.sdk`.
 
-## Étape 4 — Test
+## Step 4 — Test
 
-### Test rapide via CLI
+### Quick test via CLI
 
 ```bash
 orchestrate agents chat --name maximo_orchestrator
 ```
 
-Premier message à essayer :
+First message to try:
 
-> Quelle est la disponibilité de la pièce DRV-100-AS en stock ?
+> What is the stock availability of part DRV-100-AS?
 
-Attendu :
-1. Routage : `chat_with_collaborator_maximo_stock_agent`
-2. Tool : `get_spare_part(reference="DRV-100-AS")`
-3. Réponse : "La pièce DRV-100-AS est en rupture de stock (0 unité). Fournisseur Crane Industries, prix 245 €, délai 5 jours."
+Expected:
+1. Routing: `chat_with_collaborator_maximo_stock_agent`
+2. Tool: `get_spare_part(reference="DRV-100-AS")`
+3. Reply: "Part DRV-100-AS is out of stock (0 units). Supplier Crane Industries, price €245, lead time 5 days."
 
-### Test du parcours complet (12 questions)
+### Full end-to-end test (12 questions)
 
-Pour rejouer la démo de bout en bout (incident → diagnostic → commande → WO → clôture → cascade Slack), suivre [`scenario-demo.md`](scenario-demo.md).
+To replay the demo end to end (incident → diagnosis → order → WO → closure → Slack cascade), follow [`scenario-demo.md`](scenario-demo.md).
 
-## Mise à jour
+## Updating
 
-Après modification du code ou des définitions YAML, relancer simplement la commande d'import correspondante :
+After changing the code or the YAML definitions, simply rerun the corresponding import command:
 
 ```bash
-# Si on a modifié un tool Python
+# If you modified a Python tool
 orchestrate tools import -k python -f tools/<module>.py \
   -r tools/requirements.txt --app-id <conn>
 
-# Si on a modifié un agent YAML
+# If you modified an agent YAML
 orchestrate agents import -f agents/<agent>.yaml
 
-# Si on a modifié plusieurs choses
+# If you modified several things
 ./scripts/deploy_complete.sh
 ```
 
-Les imports sont idempotents : ils écrasent la version précédente.
+Imports are idempotent: they overwrite the previous version.
 
-## Promotion vers la production
+## Promoting to production
 
-Tout le guide ci-dessus utilise l'environnement `draft`. Pour publier en `live` :
+The whole guide above uses the `draft` environment. To publish to `live`:
 
 ```bash
-# Pour chaque connection, refaire la configuration et l'injection des credentials
+# For each connection, redo the configuration and credential injection
 orchestrate connections configure -a <conn> --env live ...
 orchestrate connections set-credentials -a <conn> --env live ...
 
-# Puis publier les agents
+# Then publish the agents
 orchestrate agents publish --name maximo_orchestrator
 ```
 
-## Dépannage
+## Troubleshooting
 
-### `Connection not found` lors de l'import d'un tool
+### `Connection not found` when importing a tool
 
-La connection référencée par `--app-id` n'a pas été créée. Revenir à l'étape 1.
+The connection referenced by `--app-id` has not been created. Go back to step 1.
 
-### `Agent collaborator not found` lors de l'import de l'orchestrateur
+### `Agent collaborator not found` when importing the orchestrator
 
-L'un des 5 agents spécialistes n'a pas encore été importé. Relancer dans l'ordre — les spécialistes d'abord, l'orchestrateur ensuite.
+One of the 5 specialist agents has not been imported yet. Rerun in order — specialists first, orchestrator second.
 
-### `Tool not found` lors de l'import d'un agent
+### `Tool not found` when importing an agent
 
-Le tool référencé dans la liste `tools:` de l'agent YAML n'existe pas dans WXO. Vérifier le nom (cf. `orchestrate tools list`) et relancer l'import du module Python concerné.
+The tool referenced in the agent YAML's `tools:` list does not exist in WXO. Check the name (see `orchestrate tools list`) and rerun the import of the relevant Python module.
 
-### Erreur Python à l'import (`Module not found`, etc.)
+### Python error on import (`Module not found`, etc.)
 
-Le fichier `tools/requirements.txt` ne liste pas une dépendance utilisée par le code. Vérifier le contenu et ajouter au besoin :
+The `tools/requirements.txt` file does not list a dependency used by the code. Check its contents and add what is missing:
 
 ```
 requests
@@ -254,42 +254,42 @@ pydantic
 pypdf
 ```
 
-### Token ServiceNow expiré pendant un test
+### ServiceNow token expired during a test
 
-Les tokens OAuth ServiceNow expirent par défaut au bout de 30 minutes. Le code des tools le renouvelle automatiquement. Si une vérification cURL échoue, regénérer un token manuellement (cf. [`connections.md`](connections.md)).
+ServiceNow OAuth tokens expire after 30 minutes by default. The tool code renews them automatically. If a cURL check fails, regenerate a token manually (see [`connections.md`](connections.md)).
 
-### L'orchestrateur affirme une action qui n'a pas été faite
+### The orchestrator claims an action that was not performed
 
-C'est le piège classique du pattern propose / confirm. Vérifier dans Show Reasoning que le tool `*_create` ou `update_*` a bien été appelé (et pas seulement le tool `propose_*`). Si l'agent saute systématiquement le tool d'exécution, renforcer les instructions de l'agent concerné (cf. [`patterns.md`](patterns.md) → règles absolues).
+This is the classic pitfall of the propose / confirm pattern. Check in Show Reasoning that the `*_create` or `update_*` tool was actually called (and not just the `propose_*` tool). If the agent systematically skips the execution tool, strengthen the instructions of the agent concerned (see [`patterns.md`](patterns.md) → absolute rules).
 
-### La cascade Slack ne se déclenche pas à la clôture
+### The Slack cascade does not trigger on closure
 
-Vérifier dans Show Reasoning que :
-1. Le retour de `update_incident` contient bien le bloc `⚠️ ATTENTION ORCHESTRATEUR — ACTION RESTANTE OBLIGATOIRE`
-2. `servicenow_ITSM_agent` a recopié ce bloc intégralement (sans le résumer)
-3. L'orchestrateur a bien délégué à `slack_notifier_agent`
+Check in Show Reasoning that:
+1. The return value of `update_incident` does contain the `⚠️ ORCHESTRATOR ATTENTION — MANDATORY REMAINING ACTION` block
+2. `servicenow_ITSM_agent` copied this block verbatim (without summarizing it)
+3. The orchestrator did delegate to `slack_notifier_agent`
 
-Si une étape manque, revoir les instructions des agents concernés.
+If a step is missing, review the instructions of the agents concerned.
 
-## Scripts disponibles
+## Available scripts
 
-Pour référence, les scripts du dossier `scripts/` :
+For reference, the scripts in the `scripts/` folder:
 
-| Script | Rôle |
-|--------|------|
-| `configure_maximo_connection.sh` | Création + config de la connection Maximo |
-| `configure_servicenow_connection.sh` | Idem pour ServiceNow |
-| `configure_supabase_connection.sh` | Idem pour Supabase |
-| `configure_slack_connection.sh` | Idem pour Slack |
-| `create_connections.sh` | Lance les 4 scripts précédents en une fois |
-| `reimport_maximo_tools.sh` | Réimporte tools/maximo_tools.py |
-| `import_supabase_tools.sh` | Importe tools/supabase_tools.py |
-| `import_all_agents.sh` | Importe les 6 agents dans le bon ordre |
-| `deploy_complete.sh` | Pipeline complet : connections + tools + agents |
+| Script | Purpose |
+|--------|---------|
+| `configure_maximo_connection.sh` | Creation + configuration of the Maximo connection |
+| `configure_servicenow_connection.sh` | Same for ServiceNow |
+| `configure_supabase_connection.sh` | Same for Supabase |
+| `configure_slack_connection.sh` | Same for Slack |
+| `create_connections.sh` | Runs the 4 previous scripts in one go |
+| `reimport_maximo_tools.sh` | Re-imports tools/maximo_tools.py |
+| `import_supabase_tools.sh` | Imports tools/supabase_tools.py |
+| `import_all_agents.sh` | Imports the 6 agents in the right order |
+| `deploy_complete.sh` | Full pipeline: connections + tools + agents |
 
-## Prochaines étapes
+## Next steps
 
-Une fois l'installation validée :
-- Rejouer le [scénario complet en 12 questions](scenario-demo.md)
-- Adapter les agents à son propre contexte (instructions, prompts, routage)
-- Ajouter d'autres systèmes selon le pattern décrit dans [`architecture.md`](architecture.md)
+Once the installation is validated:
+- Replay the [full 12-question scenario](scenario-demo.md)
+- Adapt the agents to your own context (instructions, prompts, routing)
+- Add other systems following the pattern described in [`architecture.md`](architecture.md)

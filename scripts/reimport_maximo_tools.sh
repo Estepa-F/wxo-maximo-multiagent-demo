@@ -1,25 +1,25 @@
 #!/bin/bash
 
-# Script pour réimporter les outils Maximo avec la connexion API Key
-# Ce script supprime les anciens outils et les réimporte avec la bonne connexion
+# Script to re-import the Maximo tools with the API Key connection
+# This script removes the old tools and re-imports them with the right connection
 
 set -e
 
 echo "=========================================="
-echo "Réimportation des outils Maximo"
+echo "Re-importing Maximo tools"
 echo "=========================================="
 echo ""
 
-# Vérifier que le CLI orchestrate est disponible
+# Check that the orchestrate CLI is available
 if ! command -v orchestrate &> /dev/null; then
-    echo "❌ Le CLI 'orchestrate' n'est pas installé ou n'est pas dans le PATH"
-    echo "Veuillez installer le SDK watsonx Orchestrate d'abord"
+    echo "❌ The 'orchestrate' CLI is not installed or not in the PATH"
+    echo "Please install the watsonx Orchestrate SDK first"
     exit 1
 fi
 
-# Charger les variables d'environnement si le fichier existe
+# Load environment variables if the file exists
 if [ -f .env.sdk ]; then
-    echo "📋 Chargement des variables d'environnement depuis .env.sdk..."
+    echo "📋 Loading environment variables from .env.sdk..."
     source .env.sdk
 fi
 
@@ -29,93 +29,93 @@ TOOLS_FILE="tools/maximo_tools.py"
 REQUIREMENTS_FILE="tools/requirements.txt"
 
 echo "=========================================="
-echo "Étape 1: Vérification de la connexion"
+echo "Step 1: Checking the connection"
 echo "=========================================="
 
-# Vérifier que la connexion existe
+# Check that the connection exists
 if ! orchestrate connections list | grep -q "$APP_ID"; then
-    echo "❌ La connexion '$APP_ID' n'existe pas"
-    echo "Veuillez d'abord configurer la connexion avec :"
+    echo "❌ The connection '$APP_ID' does not exist"
+    echo "Please configure the connection first with:"
     echo "  ./scripts/configure_maximo_connection.sh"
     exit 1
 fi
 
-echo "✅ Connexion '$APP_ID' trouvée"
+echo "✅ Connection '$APP_ID' found"
 
 echo ""
 echo "=========================================="
-echo "Étape 2: Liste des outils existants"
+echo "Step 2: Listing existing tools"
 echo "=========================================="
 
-# Lister les outils Maximo existants
-echo "Recherche des outils Maximo existants..."
+# List existing Maximo tools
+echo "Searching for existing Maximo tools..."
 EXISTING_TOOLS=$(orchestrate tools list --format json 2>/dev/null | jq -r '.[] | select(.name | test("maximo"; "i")) | .name' || true)
 
 if [ -n "$EXISTING_TOOLS" ]; then
-    echo "Outils Maximo trouvés :"
+    echo "Maximo tools found:"
     echo "$EXISTING_TOOLS"
     echo ""
-    read -p "Voulez-vous supprimer ces outils avant de les réimporter ? (o/N) " -n 1 -r
+    read -p "Do you want to remove these tools before re-importing them? (y/N) " -n 1 -r
     echo ""
-    if [[ $REPLY =~ ^[Oo]$ ]]; then
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
         echo ""
         echo "=========================================="
-        echo "Étape 3: Suppression des anciens outils"
+        echo "Step 3: Removing old tools"
         echo "=========================================="
-        
+
         while IFS= read -r tool_name; do
             if [ -n "$tool_name" ]; then
-                echo "Suppression de l'outil : $tool_name"
-                orchestrate tools remove --name "$tool_name" || echo "⚠️  Impossible de supprimer $tool_name"
+                echo "Removing tool: $tool_name"
+                orchestrate tools remove --name "$tool_name" || echo "⚠️  Unable to remove $tool_name"
             fi
         done <<< "$EXISTING_TOOLS"
-        
-        echo "✅ Anciens outils supprimés"
+
+        echo "✅ Old tools removed"
     else
-        echo "⏭️  Conservation des outils existants (ils seront mis à jour)"
+        echo "⏭️  Keeping existing tools (they will be updated)"
     fi
 else
-    echo "Aucun outil Maximo existant trouvé"
+    echo "No existing Maximo tools found"
 fi
 
 echo ""
 echo "=========================================="
-echo "Étape 4: Import des outils avec la connexion"
+echo "Step 4: Importing tools with the connection"
 echo "=========================================="
 
-# Importer les outils avec la connexion
-echo "Import des outils depuis $TOOLS_FILE..."
+# Import the tools with the connection
+echo "Importing tools from $TOOLS_FILE..."
 orchestrate tools import \
     --kind python \
     --file "$TOOLS_FILE" \
     --requirements-file "$REQUIREMENTS_FILE" \
     --app-id "$APP_ID"
 
-echo "✅ Outils importés avec succès"
+echo "✅ Tools imported successfully"
 
 echo ""
 echo "=========================================="
-echo "Étape 5: Vérification des outils importés"
+echo "Step 5: Verifying imported tools"
 echo "=========================================="
 
-# Lister les nouveaux outils
-echo "Outils Maximo disponibles :"
-orchestrate tools list | grep -i "maximo" || echo "Aucun outil trouvé (vérifiez les logs ci-dessus)"
+# List the new tools
+echo "Available Maximo tools:"
+orchestrate tools list | grep -i "maximo" || echo "No tools found (check the logs above)"
 
 echo ""
 echo "=========================================="
-echo "✅ Réimportation terminée avec succès !"
+echo "✅ Re-import finished successfully!"
 echo "=========================================="
 echo ""
-echo "Les outils suivants devraient maintenant être disponibles :"
+echo "The following tools should now be available:"
 echo "  - get_work_orders_for_asset"
 echo "  - get_worklogs_for_workorder"
 echo "  - list_asset_attachments"
 echo "  - get_attachment_text"
 echo ""
-echo "Ces outils utilisent maintenant la connexion '$APP_ID' (type: api_key)"
+echo "These tools now use the connection '$APP_ID' (type: api_key)"
 echo ""
-echo "Pour tester un outil, vous pouvez utiliser :"
+echo "To test a tool, you can use:"
 echo "  orchestrate tools test --name get_work_orders_for_asset"
 echo ""
 

@@ -77,7 +77,7 @@ def send_simple_message(text: str) -> SlackMessageResult:
     _post({"text": text})
     return SlackMessageResult(
         success=True,
-        message="Message envoyé sur le canal Slack."
+        message="Message sent to the Slack channel."
     )
 
 
@@ -105,25 +105,25 @@ def send_incident_summary(
     ordered (if applicable).
 
     :param incident_number: ServiceNow incident number (e.g. "INC0010001").
-    :param asset_short_desc: Asset reference and short description (e.g. "Pompe 11430 (BEDFORD)").
+    :param asset_short_desc: Asset reference and short description (e.g. "Pump 11430 (BEDFORD)").
     :param short_description: Original incident short description.
-    :param diagnostic: Brief diagnostic summary (e.g. "Vanne d'admission bloquée").
+    :param diagnostic: Brief diagnostic summary (e.g. "Inlet valve stuck").
     :param wonum: Maximo work order number created (e.g. "1207").
     :param wo_status: Work order status (e.g. "WAPPR").
     :param spare_reference: Spare part reference ordered (e.g. "DRV-100-AS").
     :param spare_amount: Spare part total amount with currency (e.g. "245€").
-    :param expected_delivery: Expected delivery date (e.g. "15 juin 2026").
+    :param expected_delivery: Expected delivery date (e.g. "June 15, 2026").
     :param supplier: Supplier name (e.g. "Crane Industries").
     :returns: Success status and confirmation message.
     """
     blocks: List[dict] = [
     {
         "type": "header",
-        "text": {"type": "plain_text", "text": f"✅ Incident {incident_number} traité"}
+        "text": {"type": "plain_text", "text": f"✅ Incident {incident_number} handled"}
     }
 ]
 
-    # Section "asset — short_description" seulement si au moins un champ
+    # "asset — short_description" section only if at least one field is set
     if asset_short_desc or short_description:
         title_parts = []
         if asset_short_desc:
@@ -135,12 +135,12 @@ def send_incident_summary(
             "text": {"type": "mrkdwn", "text": " — ".join(title_parts)}
         })
 
-    # Section incident + diagnostic seulement si on a un diagnostic
+    # Incident + diagnostic section only if a diagnostic is available
     if diagnostic:
         blocks.append({
             "type": "section",
             "fields": [
-                {"type": "mrkdwn", "text": f"*Incident:*\n{incident_number} (Résolu)"},
+                {"type": "mrkdwn", "text": f"*Incident:*\n{incident_number} (Resolved)"},
                 {"type": "mrkdwn", "text": f"*Diagnostic:*\n{diagnostic}"},
             ]
         })
@@ -160,16 +160,16 @@ def send_incident_summary(
             "type": "section",
             "fields": [
                 {"type": "mrkdwn", "text": f"*Work Order Maximo:*\n{wo_text}"},
-                {"type": "mrkdwn", "text": f"*Pièce commandée:*\n{spare_text}"},
+                {"type": "mrkdwn", "text": f"*Part ordered:*\n{spare_text}"},
             ]
         })
 
     # Context footer (delivery + supplier)
     context_parts = []
     if expected_delivery:
-        context_parts.append(f"Livraison prévue: *{expected_delivery}*")
+        context_parts.append(f"Expected delivery: *{expected_delivery}*")
     if supplier:
-        context_parts.append(f"Fournisseur: {supplier}")
+        context_parts.append(f"Supplier: {supplier}")
     if context_parts:
         blocks.append({
             "type": "context",
@@ -181,5 +181,5 @@ def send_incident_summary(
     _post({"blocks": blocks})
     return SlackMessageResult(
         success=True,
-        message=f"Récap de l'incident {incident_number} envoyé sur Slack."
+        message=f"Recap of incident {incident_number} sent to Slack."
     )

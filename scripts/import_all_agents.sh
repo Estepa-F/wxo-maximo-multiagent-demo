@@ -1,78 +1,78 @@
 #!/bin/bash
 
-# Script pour importer tous les agents Maximo dans watsonx Orchestrate
-# Importe l'orchestrateur et ses agents collaborateurs
+# Script to import all Maximo agents into watsonx Orchestrate
+# Imports the orchestrator and its collaborator agents
 
 set -e
 
 echo "=========================================="
-echo "Import des agents Maximo"
+echo "Importing Maximo agents"
 echo "=========================================="
 echo ""
 
-# Vérifier que le CLI orchestrate est disponible
+# Check that the orchestrate CLI is available
 if ! command -v orchestrate &> /dev/null; then
-    echo "❌ Le CLI 'orchestrate' n'est pas installé ou n'est pas dans le PATH"
-    echo "Veuillez installer le SDK watsonx Orchestrate d'abord"
+    echo "❌ The 'orchestrate' CLI is not installed or not in the PATH"
+    echo "Please install the watsonx Orchestrate SDK first"
     exit 1
 fi
 
-# Charger les variables d'environnement si le fichier existe
+# Load environment variables if the file exists
 if [ -f .env.sdk ]; then
-    echo "📋 Chargement des variables d'environnement depuis .env.sdk..."
+    echo "📋 Loading environment variables from .env.sdk..."
     source .env.sdk
 fi
 
 echo "=========================================="
-echo "Étape 1: Import de l'agent de diagnostic"
+echo "Step 1: Import the diagnostic agent"
 echo "=========================================="
 echo ""
-echo "Import de maximo_diagnostic_agent..."
+echo "Importing maximo_diagnostic_agent..."
 orchestrate agents import --file agents/maximo_diagnostic_agent.yaml
-echo "✅ Agent de diagnostic importé"
+echo "✅ Diagnostic agent imported"
 
 echo ""
 echo "=========================================="
-echo "Étape 2: Import de l'agent de planification"
+echo "Step 2: Import the planning agent"
 echo "=========================================="
 echo ""
-echo "Import de maximo_planning_agent..."
+echo "Importing maximo_planning_agent..."
 orchestrate agents import --file agents/maximo_planning_agent.yaml
-echo "✅ Agent de planification importé"
+echo "✅ Planning agent imported"
 
 echo ""
 echo "=========================================="
-echo "Étape 3: Import de l'agent de stock"
+echo "Step 3: Import the stock agent"
 echo "=========================================="
 echo ""
-echo "Import de maximo_stock_agent..."
+echo "Importing maximo_stock_agent..."
 orchestrate agents import --file agents/maximo_stock_agent.yaml
-echo "✅ Agent de stock importé"
+echo "✅ Stock agent imported"
 
 echo ""
 echo "=========================================="
-echo "Étape 4: Import de l'orchestrateur"
+echo "Step 4: Import the orchestrator"
 echo "=========================================="
 echo ""
-echo "Import de maximo_orchestrator..."
+echo "Importing maximo_orchestrator..."
 orchestrate agents import --file agents/maximo_orchestrator.yaml
-echo "✅ Orchestrateur importé"
+echo "✅ Orchestrator imported"
 
 echo ""
 echo "=========================================="
-echo "✅ Tous les agents ont été importés !"
+echo "✅ All agents have been imported!"
 echo "=========================================="
 echo ""
-echo "Agents disponibles :"
-echo "  1. maximo_orchestrator - Point d'entrée principal"
-echo "  2. maximo_diagnostic_agent - Consultation et analyse"
-echo "  3. maximo_planning_agent - Création et planification"
-echo "  4. maximo_stock_agent - Gestion du stock et commandes"
+echo "Available agents:"
+echo "  1. maximo_orchestrator - Main entry point"
+echo "  2. maximo_diagnostic_agent - Lookup and analysis"
+echo "  3. maximo_planning_agent - Creation and planning"
+echo "  4. maximo_stock_agent - Stock and order management"
 echo ""
-echo "Pour tester l'orchestrateur :"
+echo "To test the orchestrator:"
 echo "  orchestrate agents chat --name maximo_orchestrator"
 echo ""
-echo "Pour lister tous les agents :"
+echo "To list all agents:"
 echo "  orchestrate agents list"
 echo ""
 

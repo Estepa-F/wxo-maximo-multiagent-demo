@@ -1,28 +1,28 @@
 #!/bin/bash
 
-# Script pour configurer la connexion ServiceNow dans watsonx Orchestrate
-# Ce script vous aide à créer et configurer la connexion OAuth 2.0
+# Script to configure the ServiceNow connection in watsonx Orchestrate
+# This script helps you create and configure the OAuth 2.0 connection
 
 set -e
 
 echo "=========================================="
-echo "Configuration de la connexion ServiceNow"
+echo "ServiceNow connection configuration"
 echo "=========================================="
 echo ""
 
-# Définir le chemin vers orchestrate
+# Set the path to orchestrate
 ORCHESTRATE="${ORCHESTRATE:-./bin/orchestrate}"
 
-# Vérifier que le CLI orchestrate est disponible
+# Check that the orchestrate CLI is available
 if [ ! -x "$ORCHESTRATE" ]; then
-    echo "❌ Le CLI 'orchestrate' n'est pas trouvé à $ORCHESTRATE"
-    echo "Assurez-vous que l'environnement virtuel est configuré"
+    echo "❌ The 'orchestrate' CLI was not found at $ORCHESTRATE"
+    echo "Make sure the virtual environment is set up"
     exit 1
 fi
 
-# Charger les variables d'environnement si le fichier existe
+# Load environment variables if the file exists
 if [ -f .env.sdk ]; then
-    echo "📋 Chargement des variables d'environnement depuis .env.sdk..."
+    echo "📋 Loading environment variables from .env.sdk..."
     source .env.sdk
 fi
 
@@ -30,81 +30,81 @@ fi
 APP_ID="servicenow_conn"
 CONNECTION_FILE="connections/servicenow_conn.yaml"
 
-echo "📝 Informations requises pour ServiceNow OAuth 2.0 :"
-echo "   - URL de votre instance ServiceNow (ex: https://dev123456.service-now.com)"
-echo "   - Username (compte de service)"
-echo "   - Password (mot de passe du compte)"
+echo "📝 Required information for ServiceNow OAuth 2.0:"
+echo "   - Your ServiceNow instance URL (e.g. https://dev123456.service-now.com)"
+echo "   - Username (service account)"
+echo "   - Password (account password)"
 echo "   - Client ID (OAuth application registry)"
 echo "   - Client Secret (OAuth application registry)"
 echo ""
 
-# Demander l'URL ServiceNow
+# Ask for the ServiceNow URL
 if [ -z "$SN_INSTANCE_URL" ]; then
-    read -p "Entrez l'URL de votre instance ServiceNow: " SN_INSTANCE_URL
+    read -p "Enter your ServiceNow instance URL: " SN_INSTANCE_URL
 fi
 
 if [ -z "$SN_INSTANCE_URL" ]; then
-    echo "❌ L'URL est requise"
+    echo "❌ The URL is required"
     exit 1
 fi
 
-# Demander le username
+# Ask for the username
 if [ -z "$SN_USERNAME" ]; then
-    read -p "Entrez le username ServiceNow: " SN_USERNAME
+    read -p "Enter the ServiceNow username: " SN_USERNAME
 fi
 
 if [ -z "$SN_USERNAME" ]; then
-    echo "❌ Le username est requis"
+    echo "❌ The username is required"
     exit 1
 fi
 
-# Demander le password
+# Ask for the password
 if [ -z "$SN_PASSWORD" ]; then
-    read -sp "Entrez le password ServiceNow: " SN_PASSWORD
+    read -sp "Enter the ServiceNow password: " SN_PASSWORD
     echo ""
 fi
 
 if [ -z "$SN_PASSWORD" ]; then
-    echo "❌ Le password est requis"
+    echo "❌ The password is required"
     exit 1
 fi
 
-# Demander le client ID
+# Ask for the client ID
 if [ -z "$SN_CLIENT_ID" ]; then
-    read -p "Entrez le Client ID OAuth: " SN_CLIENT_ID
+    read -p "Enter the OAuth Client ID: " SN_CLIENT_ID
 fi
 
 if [ -z "$SN_CLIENT_ID" ]; then
-    echo "❌ Le Client ID est requis"
+    echo "❌ The Client ID is required"
     exit 1
 fi
 
-# Demander le client secret
+# Ask for the client secret
 if [ -z "$SN_CLIENT_SECRET" ]; then
-    read -sp "Entrez le Client Secret OAuth: " SN_CLIENT_SECRET
+    read -sp "Enter the OAuth Client Secret: " SN_CLIENT_SECRET
     echo ""
 fi
 
 if [ -z "$SN_CLIENT_SECRET" ]; then
-    echo "❌ Le Client Secret est requis"
+    echo "❌ The Client Secret is required"
     exit 1
 fi
 
 echo ""
 echo "=========================================="
-echo "Étape 1: Import de la connexion"
+echo "Step 1: Importing the connection"
 echo "=========================================="
 
-# Importer la connexion
+# Import the connection
 "$ORCHESTRATE" connections import --file "$CONNECTION_FILE"
-echo "✅ Connexion importée"
+echo "✅ Connection imported"
 
 echo ""
 echo "=========================================="
-echo "Étape 2: Configuration de l'environnement DRAFT"
+echo "Step 2: Configuring the DRAFT environment"
 echo "=========================================="
 
-# Configurer l'environnement draft avec OAuth 2.0 Password Grant
+# Configure the draft environment with OAuth 2.0 Password Grant
 "$ORCHESTRATE" connections configure \
     --app-id "$APP_ID" \
     --environment draft \
@@ -112,14 +112,14 @@ echo "=========================================="
     --kind oauth_auth_password_flow \
     --server-url "${SN_INSTANCE_URL}"
 
-echo "✅ Environnement draft configuré"
+echo "✅ Draft environment configured"
 
 echo ""
 echo "=========================================="
-echo "Étape 3: Définition des credentials DRAFT"
+echo "Step 3: Setting DRAFT credentials"
 echo "=========================================="
 
-# Définir les credentials pour draft (OAuth 2.0 Password Grant)
+# Set the credentials for draft (OAuth 2.0 Password Grant)
 "$ORCHESTRATE" connections set-credentials \
     --app-id "$APP_ID" \
     --environment draft \
@@ -129,14 +129,14 @@ echo "=========================================="
     --client-secret "$SN_CLIENT_SECRET" \
     --token-url "${SN_INSTANCE_URL}/oauth_token.do"
 
-echo "✅ Credentials draft définis"
+echo "✅ Draft credentials set"
 
 echo ""
 echo "=========================================="
-echo "Étape 4: Configuration de l'environnement LIVE"
+echo "Step 4: Configuring the LIVE environment"
 echo "=========================================="
 
-# Configurer l'environnement live
+# Configure the live environment
 "$ORCHESTRATE" connections configure \
     --app-id "$APP_ID" \
     --environment live \
@@ -144,14 +144,14 @@ echo "=========================================="
     --kind oauth_auth_password_flow \
     --server-url "${SN_INSTANCE_URL}"
 
-echo "✅ Environnement live configuré"
+echo "✅ Live environment configured"
 
 echo ""
 echo "=========================================="
-echo "Étape 5: Définition des credentials LIVE"
+echo "Step 5: Setting LIVE credentials"
 echo "=========================================="
 
-# Définir les credentials pour live
+# Set the credentials for live
 "$ORCHESTRATE" connections set-credentials \
     --app-id "$APP_ID" \
     --environment live \
@@ -161,22 +161,22 @@ echo "=========================================="
     --client-secret "$SN_CLIENT_SECRET" \
     --token-url "${SN_INSTANCE_URL}/oauth_token.do"
 
-echo "✅ Credentials live définis"
+echo "✅ Live credentials set"
 
 echo ""
 echo "=========================================="
-echo "✅ Configuration terminée avec succès !"
+echo "✅ Configuration finished successfully!"
 echo "=========================================="
 echo ""
-echo "Votre connexion ServiceNow est maintenant configurée et prête à être utilisée."
+echo "Your ServiceNow connection is now configured and ready to use."
 echo "App ID: $APP_ID"
 echo "Instance: $SN_INSTANCE_URL"
 echo "Auth: OAuth 2.0 Password Grant"
 echo ""
-echo "Pour vérifier la connexion, utilisez :"
+echo "To check the connection, use:"
 echo "  $ORCHESTRATE connections list"
 echo ""
-echo "Pour tester avec vos outils :"
+echo "To test with your tools:"
 echo "  orchestrate tools import --file tools/servicenow_tools.py --app-id $APP_ID"
 echo ""
 

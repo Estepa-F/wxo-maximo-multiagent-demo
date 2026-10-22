@@ -1,68 +1,68 @@
 # Tools
 
-Ce dossier contient les implémentations Python des tools utilisés par les agents dans watsonx Orchestrate.
+This folder contains the Python implementations of the tools used by the agents in watsonx Orchestrate.
 
-## Utilité des tools
+## Purpose of the tools
 
-Les tools sont les briques d'action et d'accès aux données du projet. Là où un agent porte la logique conversationnelle et la prise de décision, un tool exécute une opération concrète sur un système externe.
+Tools are the project's building blocks for actions and data access. Where an agent carries the conversational logic and decision-making, a tool performs a concrete operation on an external system.
 
-Les tools servent notamment à :
-- interroger des systèmes métier
-- lire ou écrire des données via des API
-- encapsuler la logique technique d'intégration
-- sécuriser les actions d'écriture avec des flux de confirmation
-- exposer des capacités réutilisables à plusieurs agents
+Tools are used in particular to:
+- query business systems
+- read or write data through APIs
+- encapsulate the technical integration logic
+- secure write actions with confirmation flows
+- expose reusable capabilities to several agents
 
-En pratique, les agents ne parlent pas directement aux APIs : ils appellent les tools définis dans ce dossier.
+In practice, agents do not talk directly to the APIs: they call the tools defined in this folder.
 
-## Fichiers présents dans ce dossier
+## Files in this folder
 
 ### [`maximo_tools.py`](maximo_tools.py)
-Implémente les tools pour IBM Maximo.
+Implements the tools for IBM Maximo.
 
-Il sert à :
-- rechercher des assets
-- lire les work orders d'un équipement
-- lire les worklogs
-- lister les documents attachés
-- extraire le texte d'une pièce jointe
-- proposer puis créer une work order
+It is used to:
+- search for assets
+- read the work orders of a piece of equipment
+- read worklogs
+- list attached documents
+- extract the text of an attachment
+- propose and then create a work order
 
 ### [`servicenow_tools.py`](servicenow_tools.py)
-Implémente les tools pour ServiceNow.
+Implements the tools for ServiceNow.
 
-Il sert à :
-- lire un incident
-- lister les incidents ouverts
-- préparer une mise à jour d'incident
-- appliquer une mise à jour après confirmation
+It is used to:
+- read an incident
+- list open incidents
+- prepare an incident update
+- apply an update after confirmation
 
 ### [`supabase_tools.py`](supabase_tools.py)
-Implémente les tools pour le stock et les commandes fournisseur via Supabase.
+Implements the tools for inventory and supplier orders via Supabase.
 
-Il sert à :
-- consulter une pièce détachée
-- lister les pièces sous le seuil de stock
-- consulter l'historique des commandes
-- proposer puis créer une commande fournisseur
+It is used to:
+- look up a spare part
+- list parts below the stock threshold
+- look up the order history
+- propose and then create a supplier order
 
 ### [`slack_tools.py`](slack_tools.py)
-Implémente les tools de notification Slack.
+Implements the Slack notification tools.
 
-Il sert à :
-- envoyer un message simple
-- envoyer un récapitulatif formaté de fin de traitement
+It is used to:
+- send a simple message
+- send a formatted end-of-processing recap
 
 ### [`requirements.txt`](requirements.txt)
-Liste les dépendances Python nécessaires pour exécuter ces intégrations.
+Lists the Python dependencies required to run these integrations.
 
-## En pratique
+## In practice
 
-Ce dossier regroupe donc la couche d'intégration technique du projet. Chaque fichier y définit des fonctions exposées comme tools Orchestrate, avec leurs schémas d'entrée et de sortie, leurs appels API et leurs règles d'usage.
+This folder therefore groups the project's technical integration layer. Each file defines functions exposed as Orchestrate tools, with their input and output schemas, their API calls and their usage rules.
 
-Cette organisation permet de séparer clairement :
-- la logique conversationnelle dans les agents
-- la logique technique dans les tools
-- les accès aux systèmes externes dans des modules dédiés
+This organization makes it possible to clearly separate:
+- the conversational logic in the agents
+- the technical logic in the tools
+- access to external systems in dedicated modules
 
-Le résultat est plus lisible, plus maintenable et plus simple à faire évoluer.
+The result is more readable, more maintainable and easier to evolve.

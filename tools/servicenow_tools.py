@@ -136,18 +136,20 @@ class IncidentUpdated(BaseModel):
 
 # ServiceNow incident state mapping (default install)
 STATE_LABELS = {
-    "1": "Nouveau",
-    "2": "En cours",
-    "3": "En attente",
-    "6": "Résolu",
-    "7": "Fermé",
-    "8": "Annulé",
+    "1": "New",
+    "2": "In Progress",
+    "3": "On Hold",
+    "6": "Resolved",
+    "7": "Closed",
+    "8": "Cancelled",
 }
+
+# Label -> state code. English and French labels are both accepted as input.
 
 STATE_FROM_LABEL = {
     "new": "1", "nouveau": "1",
     "in_progress": "2", "en cours": "2", "in progress": "2",
-    "on_hold": "3", "en attente": "3",
+    "on_hold": "3", "en attente": "3", "on hold": "3",
     "resolved": "6", "résolu": "6", "resolu": "6",
     "closed": "7", "fermé": "7", "ferme": "7",
     "cancelled": "8", "annulé": "8", "annule": "8",
@@ -273,12 +275,12 @@ def propose_incident_update(
     target_label = STATE_LABELS.get(target_state) if target_state else None
 
     lines = [
-        "Proposition de mise à jour ServiceNow — à confirmer :",
+        "ServiceNow update proposal — to be confirmed:",
         f"  • Incident       : {inc.number} ({inc.short_description or ''})",
-        f"  • État actuel    : {inc.state_label or inc.state or '?'}",
+        f"  • Current state  : {inc.state_label or inc.state or '?'}",
     ]
     if target_state:
-        lines.append(f"  • Nouvel état    : {target_label or target_state}")
+        lines.append(f"  • New state      : {target_label or target_state}")
     if work_notes:
         wn = work_notes if len(work_notes) <= 300 else work_notes[:297] + "..."
         lines.append(f"  • Work note      : {wn}")
@@ -288,7 +290,7 @@ def propose_incident_update(
     if close_code:
         lines.append(f"  • Close code     : {close_code}")
     lines.append("")
-    lines.append("Confirmez-vous la mise à jour ? (oui / non)")
+    lines.append("Do you confirm the update? (yes / no)")
 
     return IncidentUpdateProposal(
         summary="\n".join(lines),
@@ -363,42 +365,42 @@ def update_incident(
     # ====================================================================== #
     if target_state in ("6", "7"):
         message = (
-            f"Incident {inc.number} mis à jour avec succès. État : {new_state_label}.\n"
+            f"Incident {inc.number} successfully updated. State: {new_state_label}.\n"
             f"\n"
             f"════════════════════════════════════════════════════════════════════\n"
-            f"⚠️ ATTENTION ORCHESTRATEUR — ACTION RESTANTE OBLIGATOIRE\n"
+            f"⚠️ ORCHESTRATOR ATTENTION — MANDATORY REMAINING ACTION\n"
             f"════════════════════════════════════════════════════════════════════\n"
             f"\n"
-            f"Cette mise à jour est une CLÔTURE d'incident. Le workflow n'est PAS\n"
-            f"terminé. Avant de répondre à l'utilisateur, tu DOIS exécuter\n"
-            f"l'action suivante dans le MÊME TOUR :\n"
+            f"This update is an incident CLOSURE. The workflow is NOT finished.\n"
+            f"Before replying to the user, you MUST perform the following action\n"
+            f"in the SAME TURN:\n"
             f"\n"
-            f"  → Appelle chat_with_collaborator_slack_notifier_agent pour\n"
-            f"    demander l'envoi d'un récap sur le canal de l'équipe maintenance.\n"
+            f"  → Call chat_with_collaborator_slack_notifier_agent to request\n"
+            f"    that a recap be sent to the maintenance team channel.\n"
             f"\n"
-            f"Paramètres à transmettre au slack_notifier_agent :\n"
+            f"Parameters to pass to slack_notifier_agent:\n"
             f"  - incident_number = {inc.number}\n"
             f"  - short_description = {inc.short_description or ''}\n"
-            f"  - asset_short_desc (reconstitue depuis le contexte, ex : 'Pompe condensat 11430 (BEDFORD)')\n"
-            f"  - diagnostic (reconstitue depuis le contexte, ex : 'Vanne d''admission bloquée')\n"
-            f"  - wonum (le numéro de WO Maximo créée pendant la conversation)\n"
-            f"  - wo_status (typiquement 'WAPPR')\n"
-            f"  - spare_reference (la pièce commandée, ex : 'DRV-100-AS')\n"
-            f"  - spare_amount (le montant, ex : '245€')\n"
-            f"  - expected_delivery (la date de livraison)\n"
-            f"  - supplier (le fournisseur, ex : 'Crane Industries')\n"
+            f"  - asset_short_desc (rebuild from context, e.g. 'Condensate pump 11430 (BEDFORD)')\n"
+            f"  - diagnostic (rebuild from context, e.g. 'Inlet valve stuck')\n"
+            f"  - wonum (the Maximo WO number created during the conversation)\n"
+            f"  - wo_status (typically 'WAPPR')\n"
+            f"  - spare_reference (the part ordered, e.g. 'DRV-100-AS')\n"
+            f"  - spare_amount (the amount, e.g. '245€')\n"
+            f"  - expected_delivery (the delivery date)\n"
+            f"  - supplier (the supplier, e.g. 'Crane Industries')\n"
             f"\n"
-            f"INTERDICTION ABSOLUE : ne réponds PAS à l'utilisateur que\n"
-            f"« l'incident a été clôturé » avant d'avoir effectivement appelé\n"
-            f"chat_with_collaborator_slack_notifier_agent dans ce même tour.\n"
-            f"Une réponse à l'utilisateur sans avoir exécuté cette délégation\n"
-            f"est considérée comme une faute critique.\n"
+            f"STRICTLY FORBIDDEN: do NOT tell the user that\n"
+            f"\"the incident has been closed\" before you have actually called\n"
+            f"chat_with_collaborator_slack_notifier_agent in this same turn.\n"
+            f"Replying to the user without performing this delegation\n"
+            f"is considered a critical failure.\n"
             f"════════════════════════════════════════════════════════════════════"
         )
     else:
         message = (
-            f"Incident {inc.number} mis à jour avec succès. "
-            f"État : {new_state_label or 'inchangé'}."
+            f"Incident {inc.number} successfully updated. "
+            f"State: {new_state_label or 'unchanged'}."
         )
 
     return IncidentUpdated(

@@ -1,29 +1,29 @@
-# Configuration des connections
+# Connection configuration
 
-Ce guide explique comment configurer les **quatre connections** nécessaires au projet dans WatsonX Orchestrate :
+This guide explains how to configure the **four connections** the project needs in WatsonX Orchestrate:
 
-1. **Maximo** — API key vers IBM Maximo Application Suite
+1. **Maximo** — API key to IBM Maximo Application Suite
 2. **ServiceNow** — OAuth 2.0 Password Grant
-3. **Supabase** — API key vers la base de stock (ERP)
-4. **Slack** — Webhook URL pour les notifications
+3. **Supabase** — API key to the inventory database (ERP)
+4. **Slack** — Webhook URL for notifications
 
-Une connection WXO encapsule les credentials et l'URL d'un système externe. Elle est partagée par les tools Python qui s'authentifient grâce à elle.
+A WXO connection encapsulates the credentials and URL of an external system. It is shared by the Python tools, which authenticate through it.
 
-## Prérequis communs
+## Common prerequisites
 
-- WatsonX Orchestrate ADK installé : `pip install ibm-watsonx-orchestrate`
-- CLI `orchestrate` configuré et authentifié sur l'environnement cible
-- Fichier `.env.sdk` créé à la racine du projet (cf. ci-dessous)
+- WatsonX Orchestrate ADK installed: `pip install ibm-watsonx-orchestrate`
+- `orchestrate` CLI configured and authenticated against the target environment
+- `.env.sdk` file created at the project root (see below)
 
-### Fichier `.env.sdk`
+### `.env.sdk` file
 
-Copier le template et remplir avec ses propres valeurs :
+Copy the template and fill it in with your own values:
 
 ```bash
 cp .env.sdk.exemple .env.sdk
 ```
 
-Contenu type :
+Typical contents:
 
 ```bash
 # WatsonX Orchestrate
@@ -49,18 +49,18 @@ SUPABASE_KEY=...
 SLACK_WEBHOOK_URL=https://hooks.slack.com/services/T.../B.../...
 ```
 
-⚠️ **Ne JAMAIS commiter ce fichier**. Il doit figurer dans `.gitignore`.
+⚠️ **NEVER commit this file**. It must be listed in `.gitignore`.
 
 ---
 
-## 1. Connection Maximo
+## 1. Maximo connection
 
 ### Type
-`api_key` (la clé API Maximo est passée dans le header `apikey`).
+`api_key` (the Maximo API key is passed in the `apikey` header).
 
-### Création de la clé API Maximo
+### Creating the Maximo API key
 
-Sur l'instance Maximo, créer une clé API avec expiration infinie :
+On the Maximo instance, create an API key with no expiration:
 
 ```bash
 curl -X POST "$MAXIMO_URL/oslc/apitoken/create" \
@@ -69,23 +69,23 @@ curl -X POST "$MAXIMO_URL/oslc/apitoken/create" \
   -d '{"expiration": -1}'
 ```
 
-La réponse contient `apikey`. Stocker dans `.env.sdk` comme `MAXIMO_API_KEY`.
+The response contains `apikey`. Store it in `.env.sdk` as `MAXIMO_API_KEY`.
 
-### Import et configuration de la connection
+### Importing and configuring the connection
 
-Méthode recommandée (script automatique) :
+Recommended method (automated script):
 
 ```bash
 ./scripts/configure_maximo_connection.sh
 ```
 
-Méthode manuelle :
+Manual method:
 
 ```bash
-# 1. Importer la définition de la connection
+# 1. Import the connection definition
 orchestrate connections import -f connections/maximo_conn.yaml
 
-# 2. Configurer l'environnement draft
+# 2. Configure the draft environment
 orchestrate connections configure \
   -a maximo_conn \
   --env draft \
@@ -93,73 +93,73 @@ orchestrate connections configure \
   -k api_key \
   --server-url "$MAXIMO_URL"
 
-# 3. Injecter le credential
+# 3. Inject the credential
 orchestrate connections set-credentials \
   -a maximo_conn \
   --env draft \
   --api-key "$MAXIMO_API_KEY"
 ```
 
-Répéter les étapes 2 et 3 pour l'environnement `live` si nécessaire.
+Repeat steps 2 and 3 for the `live` environment if needed.
 
-### Vérification
+### Verification
 
 ```bash
 orchestrate connections list | grep maximo_conn
 ```
 
-Doit afficher `maximo_conn` avec le type `api_key` et le statut configuré.
+Should show `maximo_conn` with type `api_key` and a configured status.
 
-Test direct via cURL :
+Direct test via cURL:
 
 ```bash
 curl -k "$MAXIMO_URL/api/os/mxapiasset?lean=1&oslc.pageSize=1" \
   -H "apikey: $MAXIMO_API_KEY"
 ```
 
-Doit renvoyer un asset (ou une liste vide) et un code HTTP 200.
+Should return one asset (or an empty list) and an HTTP 200 code.
 
 ---
 
-## 2. Connection ServiceNow
+## 2. ServiceNow connection
 
 ### Type
 `oauth_auth_password_flow` (OAuth 2.0 Resource Owner Password Credentials Grant).
 
-⚠️ **Note de sécurité** : ce flow est moins sécurisé que Authorization Code, mais c'est le seul compatible avec un usage non-interactif simple. En production, préférer Authorization Code avec stockage de tokens, ou un compte technique avec basic auth selon le contexte.
+⚠️ **Security note**: this flow is less secure than Authorization Code, but it is the only one compatible with simple non-interactive use. In production, prefer Authorization Code with token storage, or a technical account with basic auth depending on the context.
 
-### Préparation côté ServiceNow
+### ServiceNow-side preparation
 
-Dans l'instance ServiceNow :
+In the ServiceNow instance:
 
 1. **System OAuth → Application Registry → New → Create an OAuth API endpoint for external clients**
-2. Configurer :
-   - Name : `WatsonX Orchestrate Integration`
-   - Client ID : généré automatiquement (à noter)
-   - Client Secret : généré automatiquement (à noter)
-   - Refresh Token Lifespan : `1800` (30 min)
-   - Access Token Lifespan : `1800` (30 min)
-3. Sauvegarder.
+2. Configure:
+   - Name: `WatsonX Orchestrate Integration`
+   - Client ID: generated automatically (write it down)
+   - Client Secret: generated automatically (write it down)
+   - Refresh Token Lifespan: `1800` (30 min)
+   - Access Token Lifespan: `1800` (30 min)
+3. Save.
 
-S'assurer que le compte de service utilisé a les rôles ServiceNow suivants :
-- `itil` — accès aux incidents
-- `rest_service` — autorisation API REST
+Make sure the service account used has the following ServiceNow roles:
+- `itil` — access to incidents
+- `rest_service` — REST API authorization
 
-### Import et configuration de la connection
+### Importing and configuring the connection
 
-Méthode recommandée :
+Recommended method:
 
 ```bash
 ./scripts/configure_servicenow_connection.sh
 ```
 
-Méthode manuelle :
+Manual method:
 
 ```bash
-# 1. Importer la définition
+# 1. Import the definition
 orchestrate connections import -f connections/servicenow_conn.yaml
 
-# 2. Configurer
+# 2. Configure
 orchestrate connections configure \
   -a servicenow_conn \
   --env draft \
@@ -167,7 +167,7 @@ orchestrate connections configure \
   -k oauth_auth_password_flow \
   --token-url "$SN_INSTANCE_URL/oauth_token.do"
 
-# 3. Injecter les credentials
+# 3. Inject the credentials
 orchestrate connections set-credentials \
   -a servicenow_conn \
   --env draft \
@@ -177,11 +177,11 @@ orchestrate connections set-credentials \
   --client-secret "$SN_CLIENT_SECRET"
 ```
 
-⚠️ **Si le mot de passe contient des caractères spéciaux** (`!`, `$`, `&`, etc.), utiliser des guillemets simples en zsh/bash pour éviter l'interprétation par le shell : `--password '$2#bC...'`.
+⚠️ **If the password contains special characters** (`!`, `$`, `&`, etc.), use single quotes in zsh/bash to prevent shell interpretation: `--password '$2#bC...'`.
 
-### Vérification
+### Verification
 
-Test direct via cURL pour obtenir un token :
+Direct test via cURL to obtain a token:
 
 ```bash
 curl -X POST "$SN_INSTANCE_URL/oauth_token.do" \
@@ -193,22 +193,22 @@ curl -X POST "$SN_INSTANCE_URL/oauth_token.do" \
   -d "password=$SN_PASSWORD"
 ```
 
-Doit renvoyer un JSON avec `access_token`.
+Should return a JSON payload with `access_token`.
 
-Puis vérifier qu'on peut lister un incident :
+Then check that you can list an incident:
 
 ```bash
-TOKEN=...  # access_token du retour précédent
+TOKEN=...  # access_token from the previous response
 curl "$SN_INSTANCE_URL/api/now/table/incident?sysparm_limit=1" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
-### Mapping des états ServiceNow
+### ServiceNow state mapping
 
-Le tool `update_incident` accepte les codes numériques ou les labels (français/anglais) :
+The `update_incident` tool accepts either numeric codes or labels (French/English):
 
-| Code | Label français | Label anglais |
-|------|----------------|---------------|
+| Code | French label | English label |
+|------|--------------|---------------|
 | 1 | Nouveau | New |
 | 2 | En cours | In Progress |
 | 3 | En attente | On Hold |
@@ -216,11 +216,11 @@ Le tool `update_incident` accepte les codes numériques ou les labels (français
 | 7 | Fermé | Closed |
 | 8 | Annulé | Cancelled |
 
-### Close codes valides à la clôture
+### Valid close codes on closure
 
-À la clôture d'un incident (états 6 ou 7), le champ `close_code` est obligatoire. Valeurs acceptées :
+When closing an incident (states 6 or 7), the `close_code` field is mandatory. Accepted values:
 
-- `Solution provided` ← le plus couramment utilisé dans la démo
+- `Solution provided` ← the one most commonly used in the demo
 - `Resolved by change`
 - `Resolved by caller`
 - `Resolved by request`
@@ -231,24 +231,24 @@ Le tool `update_incident` accepte les codes numériques ou les labels (français
 - `No resolution provided`
 - `Duplicate`
 
-Le champ `close_notes` (pas `work_notes`) est lui aussi obligatoire à la clôture.
+The `close_notes` field (not `work_notes`) is also mandatory on closure.
 
 ---
 
-## 3. Connection Supabase (ERP de stock)
+## 3. Supabase connection (inventory ERP)
 
-Supabase fournit la base PostgreSQL qui héberge le catalogue des pièces de rechange (`spare_parts`) et les commandes fournisseurs (`supplier_orders`). C'est la matérialisation de l'ERP de stock dans la démo.
+Supabase provides the PostgreSQL database that hosts the spare parts catalog (`spare_parts`) and supplier orders (`supplier_orders`). It is the concrete implementation of the inventory ERP in the demo.
 
 ### Type
-`api_key` (la clé `anon` Supabase est passée comme API key).
+`api_key` (the Supabase `anon` key is passed as the API key).
 
-### Préparation côté Supabase
+### Supabase-side preparation
 
-1. Créer un projet Supabase (région au choix, plan gratuit suffit)
-2. Récupérer dans **Project Settings → API** :
-   - `Project URL` (ex. `https://oxzfsrzgvgpuwhqhkihs.supabase.co`)
-   - `anon` key (JWT public, format `eyJ...`)
-3. Créer les tables nécessaires (cf. `data/supabase_schema.sql`) :
+1. Create a Supabase project (any region, the free plan is enough)
+2. From **Project Settings → API**, retrieve:
+   - `Project URL` (e.g. `https://oxzfsrzgvgpuwhqhkihs.supabase.co`)
+   - `anon` key (public JWT, format `eyJ...`)
+3. Create the required tables (see `data/supabase_schema.sql`):
 
 ```sql
 CREATE TABLE spare_parts (
@@ -277,24 +277,24 @@ CREATE TABLE supplier_orders (
 );
 ```
 
-4. Pour la démo, **désactiver la Row Level Security** sur les deux tables (la clé `anon` ne suffirait sinon pas pour les écritures) :
+4. For the demo, **disable Row Level Security** on both tables (otherwise the `anon` key would not be sufficient for writes):
 
 ```sql
 ALTER TABLE spare_parts DISABLE ROW LEVEL SECURITY;
 ALTER TABLE supplier_orders DISABLE ROW LEVEL SECURITY;
 ```
 
-⚠️ **En production**, garder RLS activé et utiliser la `service_role` key (à protéger) ou des policies SQL métier.
+⚠️ **In production**, keep RLS enabled and use the `service_role` key (to be protected) or business-specific SQL policies.
 
-### Import et configuration de la connection
+### Importing and configuring the connection
 
-Méthode recommandée :
+Recommended method:
 
 ```bash
 ./scripts/configure_supabase_connection.sh
 ```
 
-Méthode manuelle :
+Manual method:
 
 ```bash
 orchestrate connections import -f connections/supabase_conn.yaml
@@ -312,7 +312,7 @@ orchestrate connections set-credentials \
   --api-key "$SUPABASE_KEY"
 ```
 
-### Vérification
+### Verification
 
 ```bash
 curl "$SUPABASE_URL/rest/v1/spare_parts?select=*" \
@@ -320,23 +320,23 @@ curl "$SUPABASE_URL/rest/v1/spare_parts?select=*" \
   -H "Authorization: Bearer $SUPABASE_KEY"
 ```
 
-Doit renvoyer un tableau JSON avec les pièces de rechange.
+Should return a JSON array with the spare parts.
 
 ---
 
-## 4. Connection Slack
+## 4. Slack connection
 
 ### Type
-`api_key` (le webhook URL est stocké comme `api_key`).
+`api_key` (the webhook URL is stored as the `api_key`).
 
-### Préparation côté Slack
+### Slack-side preparation
 
-1. Sur le workspace Slack, créer une app via https://api.slack.com/apps → **Create New App**
+1. In the Slack workspace, create an app via https://api.slack.com/apps → **Create New App**
 2. **Activate Incoming Webhooks**
-3. Ajouter un webhook pour le canal souhaité (ex. `#maintenance-alerts`)
-4. Copier l'URL du webhook (format `https://hooks.slack.com/services/T.../B.../...`)
+3. Add a webhook for the desired channel (e.g. `#maintenance-alerts`)
+4. Copy the webhook URL (format `https://hooks.slack.com/services/T.../B.../...`)
 
-### Import et configuration de la connection
+### Importing and configuring the connection
 
 ```bash
 orchestrate connections import -f connections/slack_conn.yaml
@@ -353,54 +353,54 @@ orchestrate connections set-credentials \
   --api-key "$SLACK_WEBHOOK_URL"
 ```
 
-### Vérification
+### Verification
 
 ```bash
 curl -X POST "$SLACK_WEBHOOK_URL" \
   -H "Content-Type: application/json" \
-  -d '{"text": "Test depuis curl"}'
+  -d '{"text": "Test from curl"}'
 ```
 
-Doit renvoyer `ok` et faire apparaître le message dans le canal.
+Should return `ok` and make the message appear in the channel.
 
 ---
 
-## Récapitulatif des connections
+## Connections summary
 
-| `app_id` | Système | Type | Credentials |
-|----------|---------|------|-------------|
-| `maximo_conn` | IBM Maximo | `api_key` | API key dans header `apikey` |
+| `app_id` | System | Type | Credentials |
+|----------|--------|------|-------------|
+| `maximo_conn` | IBM Maximo | `api_key` | API key in `apikey` header |
 | `servicenow_conn` | ServiceNow | `oauth_auth_password_flow` | client_id + client_secret + username + password |
-| `supabase_conn` | Supabase (ERP stock) | `api_key` | `anon` key JWT |
+| `supabase_conn` | Supabase (inventory ERP) | `api_key` | `anon` JWT key |
 | `slack_conn` | Slack | `api_key` | webhook URL |
 
-Une fois les 4 connections configurées, passer à l'[installation des tools et des agents](installation.md).
+Once the 4 connections are configured, move on to [installing the tools and agents](installation.md).
 
-## Dépannage
+## Troubleshooting
 
-### `Connection not found` à l'import d'un tool
+### `Connection not found` when importing a tool
 
-La connection n'a pas été importée. Vérifier avec `orchestrate connections list` et relancer le script de configuration approprié.
+The connection has not been imported. Check with `orchestrate connections list` and rerun the appropriate configuration script.
 
 ### `api_key is not set in connection`
 
-Le tool est associé à une connection sans credentials. Réinjecter avec `orchestrate connections set-credentials`.
+The tool is bound to a connection that has no credentials. Re-inject them with `orchestrate connections set-credentials`.
 
-### Erreur 401 sur ServiceNow
+### 401 error on ServiceNow
 
-- Vérifier que le token n'est pas expiré (durée par défaut 30 min)
-- Vérifier que le client_id / client_secret sont bons
-- Vérifier que le mot de passe ne contient pas de caractères mal échappés
+- Check that the token has not expired (default lifetime 30 min)
+- Check that the client_id / client_secret are correct
+- Check that the password does not contain badly escaped characters
 
-### Erreur 403 sur ServiceNow
+### 403 error on ServiceNow
 
-Le compte de service n'a pas les rôles requis. Ajouter `itil` et `rest_service`.
+The service account does not have the required roles. Add `itil` and `rest_service`.
 
-### Erreur 404 sur Maximo
+### 404 error on Maximo
 
-- Vérifier que l'URL se termine par `/maximo` (pas `/oslc`)
-- Vérifier que l'asset / WO mentionné existe (`siteid` correct si nécessaire)
+- Check that the URL ends with `/maximo` (not `/oslc`)
+- Check that the referenced asset / WO exists (correct `siteid` if needed)
 
-### Supabase renvoie `[]` au lieu des données
+### Supabase returns `[]` instead of data
 
-La RLS est encore activée. Désactiver sur les tables concernées ou créer une policy explicite.
+RLS is still enabled. Disable it on the relevant tables or create an explicit policy.

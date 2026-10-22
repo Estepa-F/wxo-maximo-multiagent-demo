@@ -1,24 +1,24 @@
 #!/bin/bash
 
-# Script pour configurer la connexion Supabase dans watsonx Orchestrate
+# Script to configure the Supabase connection in watsonx Orchestrate
 
 set -e
 
 echo "=========================================="
-echo "Configuration de la connexion Supabase"
+echo "Supabase connection configuration"
 echo "=========================================="
 echo ""
 
-# Vérifier que le CLI orchestrate est disponible
+# Check that the orchestrate CLI is available
 if ! command -v orchestrate &> /dev/null; then
-    echo "❌ Le CLI 'orchestrate' n'est pas installé ou n'est pas dans le PATH"
-    echo "Veuillez installer le SDK watsonx Orchestrate d'abord"
+    echo "❌ The 'orchestrate' CLI is not installed or not in the PATH"
+    echo "Please install the watsonx Orchestrate SDK first"
     exit 1
 fi
 
-# Charger les variables d'environnement si le fichier existe
+# Load environment variables if the file exists
 if [ -f .env.sdk ]; then
-    echo "📋 Chargement des variables d'environnement depuis .env.sdk..."
+    echo "📋 Loading environment variables from .env.sdk..."
     source .env.sdk
 fi
 
@@ -29,30 +29,30 @@ SUPABASE_URL="${SUPABASE_URL:-}"
 SUPABASE_KEY="${SUPABASE_KEY:-}"
 
 if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_KEY" ]; then
-    echo "❌ Variables Supabase manquantes"
-    echo "Veuillez définir SUPABASE_URL et SUPABASE_KEY dans .env.sdk"
+    echo "❌ Missing Supabase variables"
+    echo "Please set SUPABASE_URL and SUPABASE_KEY in .env.sdk"
     exit 1
 fi
 
-echo "📝 Configuration Supabase :"
+echo "📝 Supabase configuration:"
 echo "   URL : $SUPABASE_URL"
 echo "   KEY : ${SUPABASE_KEY:0:20}..."
 echo ""
 
 echo "=========================================="
-echo "Étape 1: Import de la connexion"
+echo "Step 1: Importing the connection"
 echo "=========================================="
 
-# Importer la connexion
+# Import the connection
 orchestrate connections import --file "$CONNECTION_FILE"
-echo "✅ Connexion importée"
+echo "✅ Connection imported"
 
 echo ""
 echo "=========================================="
-echo "Étape 2: Configuration de l'environnement DRAFT"
+echo "Step 2: Configuring the DRAFT environment"
 echo "=========================================="
 
-# Configurer l'environnement draft
+# Configure the draft environment
 orchestrate connections configure \
     --app-id "$APP_ID" \
     --environment draft \
@@ -60,27 +60,27 @@ orchestrate connections configure \
     --kind api_key \
     --server-url "$SUPABASE_URL"
 
-echo "✅ Environnement draft configuré"
+echo "✅ Draft environment configured"
 
 echo ""
 echo "=========================================="
-echo "Étape 3: Définition des credentials DRAFT"
+echo "Step 3: Setting DRAFT credentials"
 echo "=========================================="
 
-# Définir les credentials pour draft
+# Set the credentials for draft
 orchestrate connections set-credentials \
     --app-id "$APP_ID" \
     --environment draft \
     --api-key "$SUPABASE_KEY"
 
-echo "✅ Credentials draft définis"
+echo "✅ Draft credentials set"
 
 echo ""
 echo "=========================================="
-echo "Étape 4: Configuration de l'environnement LIVE"
+echo "Step 4: Configuring the LIVE environment"
 echo "=========================================="
 
-# Configurer l'environnement live
+# Configure the live environment
 orchestrate connections configure \
     --app-id "$APP_ID" \
     --environment live \
@@ -88,34 +88,34 @@ orchestrate connections configure \
     --kind api_key \
     --server-url "$SUPABASE_URL"
 
-echo "✅ Environnement live configuré"
+echo "✅ Live environment configured"
 
 echo ""
 echo "=========================================="
-echo "Étape 5: Définition des credentials LIVE"
+echo "Step 5: Setting LIVE credentials"
 echo "=========================================="
 
-# Définir les credentials pour live
+# Set the credentials for live
 orchestrate connections set-credentials \
     --app-id "$APP_ID" \
     --environment live \
     --api-key "$SUPABASE_KEY"
 
-echo "✅ Credentials live définis"
+echo "✅ Live credentials set"
 
 echo ""
 echo "=========================================="
-echo "✅ Configuration terminée avec succès !"
+echo "✅ Configuration finished successfully!"
 echo "=========================================="
 echo ""
-echo "Votre connexion Supabase est maintenant configurée et prête à être utilisée."
+echo "Your Supabase connection is now configured and ready to use."
 echo "App ID: $APP_ID"
 echo "URL: $SUPABASE_URL"
 echo ""
-echo "Pour vérifier la connexion, utilisez :"
+echo "To check the connection, use:"
 echo "  orchestrate connections list"
 echo ""
-echo "Pour utiliser cette connexion avec vos outils :"
+echo "To use this connection with your tools:"
 echo "  orchestrate tools import --file tools/supabase_tools.py --app-id $APP_ID"
 echo ""
 
