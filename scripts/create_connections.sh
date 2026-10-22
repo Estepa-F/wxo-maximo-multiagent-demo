@@ -36,8 +36,8 @@ if [ -f "$ROOT/connections/maximo_conn.yaml" ]; then
     source "$ROOT/.env.sdk"
     
     if [ -z "${MAXIMO_URL:-}" ] || [ -z "${MAXIMO_API_KEY:-}" ]; then
-      echo "⚠️  MAXIMO_URL ou MAXIMO_API_KEY manquant dans .env.sdk"
-      echo "  Configurez ces variables puis relancez le script"
+      echo "⚠️  MAXIMO_URL or MAXIMO_API_KEY missing in .env.sdk"
+      echo "  Set these variables and then re-run the script"
     else
       # Configure for both draft and live environments
       for env in draft live; do

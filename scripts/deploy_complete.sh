@@ -1,199 +1,199 @@
 #!/usr/bin/env bash
-# Script de déploiement complet pour watsonx Orchestrate
-# Déploie toutes les connexions, outils et agents (Maximo + ServiceNow)
+# Full deployment script for watsonx Orchestrate
+# Deploys all connections, tools and agents (Maximo + ServiceNow)
 # Usage: ./scripts/deploy_complete.sh
 
-set -e  # Arrêt en cas d'erreur
+set -e  # Stop on error
 
 ORCH="${ORCH:-./bin/orchestrate}"
 
 echo "=========================================="
-echo "Déploiement complet watsonx Orchestrate"
+echo "Full watsonx Orchestrate deployment"
 echo "=========================================="
 echo ""
 
-# Vérifier que le CLI orchestrate existe
+# Check that the orchestrate CLI exists
 if [ ! -x "$ORCH" ]; then
   echo "ERROR: orchestrate CLI not found at $ORCH"
   echo "Run: make install"
   exit 1
 fi
 
-# Vérifier qu'un environnement est actif
-echo "📋 Vérification de l'environnement actif..."
+# Check that an environment is active
+echo "📋 Checking the active environment..."
 "$ORCH" env list | grep "(active)" || {
-    echo "⚠️  Aucun environnement WXO actif"
-    echo "Exécutez: orchestrate env activate <nom-environnement>"
+    echo "⚠️  No active WXO environment"
+    echo "Run: orchestrate env activate <environment-name>"
     exit 1
 }
-echo "✅ Environnement WXO actif"
+echo "✅ WXO environment active"
 echo ""
 
-# Étape 1: Déployer les connexions
+# Step 1: Deploy connections
 echo "=========================================="
-echo "📦 Étape 1/3: Déploiement des connexions"
+echo "📦 Step 1/3: Deploying connections"
 echo "=========================================="
 bash scripts/create_connections.sh
 echo ""
 
-# Étape 2: Déployer les outils
+# Step 2: Deploy tools
 echo "=========================================="
-echo "🔧 Étape 2/3: Déploiement des outils"
+echo "🔧 Step 2/3: Deploying tools"
 echo "=========================================="
 
-# Outils Maximo
+# Maximo tools
 if [ -f "tools/maximo_tools.py" ]; then
-  echo "Déploiement des outils Maximo..."
+  echo "Deploying Maximo tools..."
   "$ORCH" tools import -k python -f tools/maximo_tools.py \
     --app-id maximo_conn --requirements-file tools/requirements.txt
-  echo "✅ Outils Maximo déployés"
+  echo "✅ Maximo tools deployed"
 else
-  echo "⚠️  tools/maximo_tools.py non trouvé"
+  echo "⚠️  tools/maximo_tools.py not found"
 fi
 
-# Outils ServiceNow
+# ServiceNow tools
 if [ -f "tools/servicenow_tools.py" ]; then
-  echo "Déploiement des outils ServiceNow..."
+  echo "Deploying ServiceNow tools..."
   "$ORCH" tools import -k python -f tools/servicenow_tools.py \
     --app-id servicenow_conn --requirements-file tools/requirements.txt
-  echo "✅ Outils ServiceNow déployés"
+  echo "✅ ServiceNow tools deployed"
 else
-  echo "⚠️  tools/servicenow_tools.py non trouvé"
+  echo "⚠️  tools/servicenow_tools.py not found"
 fi
 
-# Outils Supabase
+# Supabase tools
 if [ -f "tools/supabase_tools.py" ]; then
-  echo "Déploiement des outils Supabase..."
+  echo "Deploying Supabase tools..."
   "$ORCH" tools import -k python -f tools/supabase_tools.py \
     --app-id supabase_conn --requirements-file tools/requirements.txt
-  echo "✅ Outils Supabase déployés"
+  echo "✅ Supabase tools deployed"
 else
-  echo "⚠️  tools/supabase_tools.py non trouvé"
+  echo "⚠️  tools/supabase_tools.py not found"
 fi
 
-# Outils Slack
+# Slack tools
 if [ -f "tools/slack_tools.py" ]; then
-  echo "Déploiement des outils Slack..."
+  echo "Deploying Slack tools..."
   "$ORCH" tools import -k python -f tools/slack_tools.py \
     --app-id slack_conn --requirements-file tools/requirements.txt
-  echo "✅ Outils Slack déployés"
+  echo "✅ Slack tools deployed"
 else
-  echo "⚠️  tools/slack_tools.py non trouvé"
+  echo "⚠️  tools/slack_tools.py not found"
 fi
 
 echo ""
 
-# Étape 3: Déployer les agents
+# Step 3: Deploy agents
 echo "=========================================="
-echo "🤖 Étape 3/3: Déploiement des agents"
+echo "🤖 Step 3/3: Deploying agents"
 echo "=========================================="
 
-# Agent Maximo
+# Maximo agent
 if [ -f "agents/maximo_agent.yaml" ]; then
-  echo "Déploiement de l'agent Maximo..."
+  echo "Deploying the Maximo agent..."
   "$ORCH" agents import -f agents/maximo_agent.yaml
-  echo "✅ Agent Maximo déployé"
+  echo "✅ Maximo agent deployed"
 else
-  echo "⚠️  agents/maximo_agent.yaml non trouvé"
+  echo "⚠️  agents/maximo_agent.yaml not found"
 fi
 
-# Agent ServiceNow
+# ServiceNow agent
 if [ -f "agents/servicenow_ITSM_agent.yaml" ]; then
-  echo "Déploiement de l'agent ServiceNow ITSM..."
+  echo "Deploying the ServiceNow ITSM agent..."
   "$ORCH" agents import -f agents/servicenow_ITSM_agent.yaml
-  echo "✅ Agent servicenow_ITSM_agent déployé"
+  echo "✅ Agent servicenow_ITSM_agent deployed"
 else
-  echo "⚠️  agents/servicenow_ITSM_agent.yaml non trouvé"
+  echo "⚠️  agents/servicenow_ITSM_agent.yaml not found"
 fi
 
-# Agent Maximo Diagnostic
+# Maximo Diagnostic agent
 if [ -f "agents/maximo_diagnostic_agent.yaml" ]; then
-  echo "Déploiement de l'agent Maximo Diagnostic..."
+  echo "Deploying the Maximo Diagnostic agent..."
   "$ORCH" agents import -f agents/maximo_diagnostic_agent.yaml
-  echo "✅ Agent maximo_diagnostic_agent déployé"
+  echo "✅ Agent maximo_diagnostic_agent deployed"
 else
-  echo "⚠️  agents/maximo_diagnostic_agent.yaml non trouvé"
+  echo "⚠️  agents/maximo_diagnostic_agent.yaml not found"
 fi
 
-# Agent Maximo Planning
+# Maximo Planning agent
 if [ -f "agents/maximo_planning_agent.yaml" ]; then
-  echo "Déploiement de l'agent Maximo Planning..."
+  echo "Deploying the Maximo Planning agent..."
   "$ORCH" agents import -f agents/maximo_planning_agent.yaml
-  echo "✅ Agent maximo_planning_agent déployé"
+  echo "✅ Agent maximo_planning_agent deployed"
 else
-  echo "⚠️  agents/maximo_planning_agent.yaml non trouvé"
+  echo "⚠️  agents/maximo_planning_agent.yaml not found"
 fi
 
-# Agent Maximo Stock
+# Maximo Stock agent
 if [ -f "agents/maximo_stock_agent.yaml" ]; then
-  echo "Déploiement de l'agent Maximo Stock..."
+  echo "Deploying the Maximo Stock agent..."
   "$ORCH" agents import -f agents/maximo_stock_agent.yaml
-  echo "✅ Agent maximo_stock_agent déployé"
+  echo "✅ Agent maximo_stock_agent deployed"
 else
-  echo "⚠️  agents/maximo_stock_agent.yaml non trouvé"
+  echo "⚠️  agents/maximo_stock_agent.yaml not found"
 fi
 
-# Agent Slack Notifier
+# Slack Notifier agent
 if [ -f "agents/slack_notifier_agent.yaml" ]; then
-  echo "Déploiement de l'agent Slack Notifier..."
+  echo "Deploying the Slack Notifier agent..."
   "$ORCH" agents import -f agents/slack_notifier_agent.yaml
-  echo "✅ Agent slack_notifier_agent déployé"
+  echo "✅ Agent slack_notifier_agent deployed"
 else
-  echo "⚠️  agents/slack_notifier_agent.yaml non trouvé"
+  echo "⚠️  agents/slack_notifier_agent.yaml not found"
 fi
 
-# Agent Orchestrateur (déployer en dernier car il dépend des autres)
+# Orchestrator agent (deploy last since it depends on the others)
 if [ -f "agents/maximo_orchestrator.yaml" ]; then
-  echo "Déploiement de l'agent Orchestrateur..."
+  echo "Deploying the Orchestrator agent..."
   "$ORCH" agents import -f agents/maximo_orchestrator.yaml
-  echo "✅ Agent maximo_orchestrator déployé"
+  echo "✅ Agent maximo_orchestrator deployed"
 else
-  echo "⚠️  agents/maximo_orchestrator.yaml non trouvé"
+  echo "⚠️  agents/maximo_orchestrator.yaml not found"
 fi
 
 echo ""
 echo "=========================================="
-echo "✅ Déploiement complet terminé!"
+echo "✅ Full deployment finished!"
 echo "=========================================="
 echo ""
-echo "📝 Résumé des composants déployés:"
+echo "📝 Summary of deployed components:"
 echo ""
-echo "Connexions:"
+echo "Connections:"
 echo "  - maximo_conn (Maximo API)"
 echo "  - servicenow_conn (ServiceNow OAuth)"
 echo "  - supabase_conn (Supabase REST API)"
 echo "  - slack_conn (Slack Webhook)"
 echo ""
-echo "Outils:"
+echo "Tools:"
 echo "  - Maximo: get_workorder, get_asset, search_workorders, get_workorder_logs"
 echo "  - ServiceNow: get_incident, list_open_incidents, propose_incident_update, update_incident"
 echo "  - Supabase: get_spare_part, list_low_stock_parts, propose_supplier_order, create_supplier_order"
 echo "  - Slack: send_simple_message, send_incident_summary"
 echo ""
 echo "Agents:"
-echo "  - maximo_agent (Gestion Maximo)"
-echo "  - servicenow_ITSM_agent (Gestion ServiceNow)"
-echo "  - maximo_diagnostic_agent (Diagnostic Maximo)"
-echo "  - maximo_planning_agent (Planification Maximo)"
-echo "  - maximo_stock_agent (Gestion stock Supabase)"
-echo "  - slack_notifier_agent (Notifications Slack)"
-echo "  - maximo_orchestrator (Orchestrateur principal)"
+echo "  - maximo_agent (Maximo management)"
+echo "  - servicenow_ITSM_agent (ServiceNow management)"
+echo "  - maximo_diagnostic_agent (Maximo diagnostics)"
+echo "  - maximo_planning_agent (Maximo planning)"
+echo "  - maximo_stock_agent (Supabase stock management)"
+echo "  - slack_notifier_agent (Slack notifications)"
+echo "  - maximo_orchestrator (Main orchestrator)"
 echo ""
-echo "💡 Prochaines étapes:"
-echo "1. Testez les agents avec: orchestrate chat start -a <agent-name>"
-echo "2. Ou via l'interface web de watsonx Orchestrate"
+echo "💡 Next steps:"
+echo "1. Test the agents with: orchestrate chat start -a <agent-name>"
+echo "2. Or through the watsonx Orchestrate web interface"
 echo ""
-echo "📋 Exemples de questions pour l'orchestrateur:"
+echo "📋 Example questions for the orchestrator:"
 echo ""
-echo "  - J'ai reçu le ticket INC0010001, peux-tu le traiter ?"
-echo "  - Analyse l'incident INC0010002 et crée un work order si nécessaire"
-echo "  - Vérifie le stock de pièces pour la pompe 11430"
+echo "  - I received ticket INC0010001, can you handle it?"
+echo "  - Analyze incident INC0010002 and create a work order if needed"
+echo "  - Check the parts stock for pump 11430"
 echo ""
-echo "Pour tester individuellement:"
-echo "  - maximo_agent: Quelles sont les dernières interventions sur l'asset 11430 ?"
-echo "  - servicenow_ITSM_agent: Quels sont les incidents ouverts ?"
-echo "  - maximo_stock_agent: Y a-t-il des pièces en rupture de stock ?"
-echo "  - slack_notifier_agent: Envoie un message de test sur Slack"
+echo "To test individually:"
+echo "  - maximo_agent: What are the latest interventions on asset 11430?"
+echo "  - servicenow_ITSM_agent: What are the open incidents?"
+echo "  - maximo_stock_agent: Are there any parts out of stock?"
+echo "  - slack_notifier_agent: Send a test message on Slack"
 echo ""
 
 # Made with Bob

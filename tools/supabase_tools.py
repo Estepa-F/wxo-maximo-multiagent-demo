@@ -268,24 +268,24 @@ def propose_supplier_order(
     total = round(unit_price * quantity, 2) if unit_price else None
     lead = part.get("lead_time_days") or 0
     delivery = (date.today() + timedelta(days=lead)).isoformat() if lead else None
-    supplier = part.get("supplier") or "Fournisseur inconnu"
+    supplier = part.get("supplier") or "Unknown supplier"
 
     lines = [
-        "Proposition de commande fournisseur — à confirmer :",
-        f"  • Référence       : {reference} ({part.get('description', '')})",
-        f"  • Quantité        : {quantity}",
-        f"  • Fournisseur     : {supplier}",
+        "Supplier order proposal — to be confirmed:",
+        f"  • Reference        : {reference} ({part.get('description', '')})",
+        f"  • Quantity         : {quantity}",
+        f"  • Supplier         : {supplier}",
     ]
     if unit_price is not None:
-        lines.append(f"  • Prix unitaire   : {unit_price:.2f} €")
-        lines.append(f"  • Montant total   : {total:.2f} €")
+        lines.append(f"  • Unit price       : {unit_price:.2f} €")
+        lines.append(f"  • Total amount     : {total:.2f} €")
     if lead:
-        lines.append(f"  • Délai           : {lead} jour(s)")
-        lines.append(f"  • Livraison prévue: {delivery}")
+        lines.append(f"  • Lead time        : {lead} day(s)")
+        lines.append(f"  • Expected delivery: {delivery}")
     if related_wonum:
-        lines.append(f"  • WO associée     : {related_wonum}")
+        lines.append(f"  • Related WO       : {related_wonum}")
     lines.append("")
-    lines.append("Confirmez-vous la commande ? (oui / non)")
+    lines.append("Do you confirm the order? (yes / no)")
 
     return SupplierOrderProposal(
         summary="\n".join(lines),

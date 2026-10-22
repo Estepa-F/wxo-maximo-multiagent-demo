@@ -370,7 +370,7 @@ def propose_work_order(
     the asset exists and returns a human-readable summary.
 
     ALWAYS call this tool BEFORE create_work_order. Show the summary to the user,
-    ask them to confirm explicitly ("oui", "yes", "confirme", "go", "valide")
+    ask them to confirm explicitly ("yes", "confirm", "go", "ok", "oui")
     before calling create_work_order with the same parameters.
 
     :param assetnum: Asset number (e.g. "11430").
@@ -394,22 +394,22 @@ def propose_work_order(
     resolved_site = siteid or members[0].get("siteid")
     asset_desc = members[0].get("description") or ""
 
-    priority_label = {1: "critique", 2: "haute", 3: "moyenne", 4: "faible"}.get(wopriority, "très faible")
-    worktype_label = {"PM": "Maintenance préventive", "CM": "Maintenance corrective",
-                       "EM": "Urgence"}.get(worktype.upper(), worktype)
+    priority_label = {1: "critical", 2: "high", 3: "medium", 4: "low"}.get(wopriority, "very low")
+    worktype_label = {"PM": "Preventive maintenance", "CM": "Corrective maintenance",
+                       "EM": "Emergency"}.get(worktype.upper(), worktype)
 
     lines = [
-        "Proposition de création de work order — à confirmer :",
+        "Work order creation proposal — to be confirmed:",
         f"  • Asset       : {assetnum} ({asset_desc})",
         f"  • Site        : {resolved_site}",
         f"  • Description : {description}",
         f"  • Type        : {worktype.upper()} ({worktype_label})",
-        f"  • Priorité    : {wopriority} ({priority_label})",
+        f"  • Priority    : {wopriority} ({priority_label})",
     ]
     if targstartdate:
-        lines.append(f"  • Date cible  : {targstartdate}")
+        lines.append(f"  • Target date : {targstartdate}")
     lines.append("")
-    lines.append("Confirmez-vous la création ? (oui / non)")
+    lines.append("Do you confirm the creation? (yes / no)")
     summary = "\n".join(lines)
 
     return WorkOrderProposal(
@@ -530,12 +530,12 @@ def create_work_order(
             pass
 
     return WorkOrderCreated(
-        wonum=str(wonum) if wonum else "(numéro non retourné par Maximo)",
+        wonum=str(wonum) if wonum else "(number not returned by Maximo)",
         status=status,
         href=href,
         message=(
-            f"Work order créée avec succès sur l'asset {assetnum} (site {siteid})."
-            + (f" Numéro : {wonum}." if wonum else "")
-            + (f" Statut initial : {status}." if status else "")
+            f"Work order successfully created on asset {assetnum} (site {siteid})."
+            + (f" Number: {wonum}." if wonum else "")
+            + (f" Initial status: {status}." if status else "")
         ),
     )

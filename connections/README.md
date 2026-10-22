@@ -1,61 +1,61 @@
 # Connections
 
-Ce dossier contient les définitions des connexions utilisées par les tools et les agents dans watsonx Orchestrate.
+This folder contains the definitions of the connections used by the tools and agents in watsonx Orchestrate.
 
-## Utilité des connexions
+## Purpose of the connections
 
-Les connexions permettent de déclarer comment le projet accède aux systèmes externes. Elles centralisent les informations de connexion nécessaires aux tools sans les coder directement dans les fichiers Python.
+Connections declare how the project accesses external systems. They centralize the connection information the tools need without hard-coding it in the Python files.
 
-Les connexions servent à :
-- configurer l'accès aux systèmes externes
-- séparer la configuration de la logique applicative
-- stocker les paramètres techniques par environnement
-- permettre aux tools d'utiliser les bons identifiants et URLs
-- faciliter le déploiement et la maintenance des intégrations
+The connections are used to:
+- configure access to external systems
+- separate configuration from application logic
+- store technical parameters per environment
+- let the tools use the right credentials and URLs
+- make deploying and maintaining the integrations easier
 
-En pratique, les tools lisent ces connexions via watsonx Orchestrate pour appeler Maximo, ServiceNow, Slack ou Supabase.
+In practice, the tools read these connections through watsonx Orchestrate to call Maximo, ServiceNow, Slack or Supabase.
 
-## Fichiers présents dans ce dossier
+## Files in this folder
 
 ### [`maximo_conn.yaml`](maximo_conn.yaml)
-Définit la connexion vers IBM Maximo.
+Defines the connection to IBM Maximo.
 
-Elle sert à :
-- déclarer l'URL du serveur Maximo
-- configurer une authentification de type API key
-- fournir la base de connexion utilisée par [`maximo_tools.py`](../tools/maximo_tools.py)
+It is used to:
+- declare the Maximo server URL
+- configure API key authentication
+- provide the connection base used by [`maximo_tools.py`](../tools/maximo_tools.py)
 
 ### [`servicenow_conn.yaml`](servicenow_conn.yaml)
-Définit la connexion vers ServiceNow.
+Defines the connection to ServiceNow.
 
-Elle sert à :
-- déclarer l'URL de l'instance ServiceNow
-- configurer une authentification OAuth password flow
-- fournir la connexion utilisée par [`servicenow_tools.py`](../tools/servicenow_tools.py)
+It is used to:
+- declare the ServiceNow instance URL
+- configure OAuth password flow authentication
+- provide the connection used by [`servicenow_tools.py`](../tools/servicenow_tools.py)
 
 ### [`slack_conn.yaml`](slack_conn.yaml)
-Définit la connexion vers Slack.
+Defines the connection to Slack.
 
-Elle sert à :
-- stocker les variables nécessaires à l'envoi de notifications
-- configurer une connexion de type key/value
-- fournir la configuration utilisée par [`slack_tools.py`](../tools/slack_tools.py)
+It is used to:
+- store the variables needed to send notifications
+- configure a key/value connection
+- provide the configuration used by [`slack_tools.py`](../tools/slack_tools.py)
 
 ### [`supabase_conn.yaml`](supabase_conn.yaml)
-Définit la connexion vers Supabase.
+Defines the connection to Supabase.
 
-Elle sert à :
-- stocker l'URL et la clé d'accès Supabase
-- configurer une connexion de type key/value
-- fournir la configuration utilisée par [`supabase_tools.py`](../tools/supabase_tools.py)
+It is used to:
+- store the Supabase URL and access key
+- configure a key/value connection
+- provide the configuration used by [`supabase_tools.py`](../tools/supabase_tools.py)
 
-## En pratique
+## In practice
 
-Ce dossier regroupe donc la configuration d'accès aux services externes du projet. Chaque fichier YAML définit un `app_id`, un type de connexion et les environnements disponibles, généralement `draft` et `live`.
+This folder therefore holds the access configuration for the project's external services. Each YAML file defines an `app_id`, a connection type and the available environments, usually `draft` and `live`.
 
-Cette organisation permet de séparer clairement :
-- les secrets et paramètres d'accès dans les connexions
-- la logique technique dans les tools
-- la logique conversationnelle dans les agents
+This organization makes it possible to clearly separate:
+- secrets and access parameters in the connections
+- the technical logic in the tools
+- the conversational logic in the agents
 
-Le résultat est plus propre, plus sécurisé et plus simple à administrer.
+The result is cleaner, more secure and simpler to administer.

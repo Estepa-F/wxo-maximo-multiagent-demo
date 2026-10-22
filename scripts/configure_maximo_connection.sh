@@ -1,25 +1,25 @@
 #!/bin/bash
 
-# Script pour configurer la connexion Maximo dans watsonx Orchestrate
-# Ce script vous aide à créer et configurer la connexion avec votre clé API
+# Script to configure the Maximo connection in watsonx Orchestrate
+# This script helps you create and configure the connection with your API key
 
 set -e
 
 echo "=========================================="
-echo "Configuration de la connexion Maximo"
+echo "Maximo connection configuration"
 echo "=========================================="
 echo ""
 
-# Vérifier que le CLI orchestrate est disponible
+# Check that the orchestrate CLI is available
 if ! command -v orchestrate &> /dev/null; then
-    echo "❌ Le CLI 'orchestrate' n'est pas installé ou n'est pas dans le PATH"
-    echo "Veuillez installer le SDK watsonx Orchestrate d'abord"
+    echo "❌ The 'orchestrate' CLI is not installed or not in the PATH"
+    echo "Please install the watsonx Orchestrate SDK first"
     exit 1
 fi
 
-# Charger les variables d'environnement si le fichier existe
+# Load environment variables if the file exists
 if [ -f .env.sdk ]; then
-    echo "📋 Chargement des variables d'environnement depuis .env.sdk..."
+    echo "📋 Loading environment variables from .env.sdk..."
     source .env.sdk
 fi
 
@@ -27,52 +27,52 @@ fi
 APP_ID="maximo_conn"
 CONNECTION_FILE="connections/maximo_conn.yaml"
 
-echo "📝 Informations requises :"
-echo "   - URL de votre API Maximo"
-echo "   - Clé API Maximo"
+echo "📝 Required information:"
+echo "   - Your Maximo API URL"
+echo "   - Maximo API key"
 echo ""
 
-# Demander l'URL Maximo
-read -p "Entrez l'URL de votre API Maximo (ex: https://maximo.example.com/api): " MAXIMO_URL
+# Ask for the Maximo URL
+read -p "Enter your Maximo API URL (e.g. https://maximo.example.com/api): " MAXIMO_URL
 
 if [ -z "$MAXIMO_URL" ]; then
-    echo "❌ L'URL est requise"
+    echo "❌ The URL is required"
     exit 1
 fi
 
-# Demander la clé API
-read -sp "Entrez votre clé API Maximo: " MAXIMO_API_KEY
+# Ask for the API key
+read -sp "Enter your Maximo API key: " MAXIMO_API_KEY
 echo ""
 
 if [ -z "$MAXIMO_API_KEY" ]; then
-    echo "❌ La clé API est requise"
+    echo "❌ The API key is required"
     exit 1
 fi
 
 echo ""
 echo "=========================================="
-echo "Étape 1: Mise à jour du fichier de connexion"
+echo "Step 1: Updating the connection file"
 echo "=========================================="
 
-# Mettre à jour le fichier YAML avec l'URL
+# Update the YAML file with the URL
 sed -i.bak "s|server_url: YOUR_MAXIMO_URL_HERE|server_url: $MAXIMO_URL|g" "$CONNECTION_FILE"
-echo "✅ Fichier de connexion mis à jour avec l'URL"
+echo "✅ Connection file updated with the URL"
 
 echo ""
 echo "=========================================="
-echo "Étape 2: Import de la connexion"
+echo "Step 2: Importing the connection"
 echo "=========================================="
 
-# Importer la connexion
+# Import the connection
 orchestrate connections import --file "$CONNECTION_FILE"
-echo "✅ Connexion importée"
+echo "✅ Connection imported"
 
 echo ""
 echo "=========================================="
-echo "Étape 3: Configuration de l'environnement DRAFT"
+echo "Step 3: Configuring the DRAFT environment"
 echo "=========================================="
 
-# Configurer l'environnement draft
+# Configure the draft environment
 orchestrate connections configure \
     --app-id "$APP_ID" \
     --environment draft \
@@ -80,27 +80,27 @@ orchestrate connections configure \
     --kind api_key \
     --server-url "$MAXIMO_URL"
 
-echo "✅ Environnement draft configuré"
+echo "✅ Draft environment configured"
 
 echo ""
 echo "=========================================="
-echo "Étape 4: Définition des credentials DRAFT"
+echo "Step 4: Setting DRAFT credentials"
 echo "=========================================="
 
-# Définir les credentials pour draft
+# Set the credentials for draft
 orchestrate connections set-credentials \
     --app-id "$APP_ID" \
     --environment draft \
     --api-key "$MAXIMO_API_KEY"
 
-echo "✅ Credentials draft définis"
+echo "✅ Draft credentials set"
 
 echo ""
 echo "=========================================="
-echo "Étape 5: Configuration de l'environnement LIVE"
+echo "Step 5: Configuring the LIVE environment"
 echo "=========================================="
 
-# Configurer l'environnement live
+# Configure the live environment
 orchestrate connections configure \
     --app-id "$APP_ID" \
     --environment live \
@@ -108,34 +108,34 @@ orchestrate connections configure \
     --kind api_key \
     --server-url "$MAXIMO_URL"
 
-echo "✅ Environnement live configuré"
+echo "✅ Live environment configured"
 
 echo ""
 echo "=========================================="
-echo "Étape 6: Définition des credentials LIVE"
+echo "Step 6: Setting LIVE credentials"
 echo "=========================================="
 
-# Définir les credentials pour live
+# Set the credentials for live
 orchestrate connections set-credentials \
     --app-id "$APP_ID" \
     --environment live \
     --api-key "$MAXIMO_API_KEY"
 
-echo "✅ Credentials live définis"
+echo "✅ Live credentials set"
 
 echo ""
 echo "=========================================="
-echo "✅ Configuration terminée avec succès !"
+echo "✅ Configuration finished successfully!"
 echo "=========================================="
 echo ""
-echo "Votre connexion Maximo est maintenant configurée et prête à être utilisée."
+echo "Your Maximo connection is now configured and ready to use."
 echo "App ID: $APP_ID"
 echo "URL: $MAXIMO_URL"
 echo ""
-echo "Pour vérifier la connexion, utilisez :"
+echo "To check the connection, use:"
 echo "  orchestrate connections list"
 echo ""
-echo "Pour tester avec vos outils :"
+echo "To test with your tools:"
 echo "  orchestrate tools import --file tools/maximo_tools.py --app-id $APP_ID"
 echo ""
 

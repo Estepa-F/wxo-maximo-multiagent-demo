@@ -1,15 +1,15 @@
-# Architecture multi-agents
+# Multi-agent architecture
 
-Ce document décrit l'architecture du projet : 1 orchestrateur, 5 agents spécialisés, 4 systèmes connectés (ServiceNow, IBM Maximo, ERP Supabase, Slack).
+This document describes the project architecture: 1 orchestrator, 5 specialized agents, 4 connected systems (ServiceNow, IBM Maximo, Supabase ERP, Slack).
 
-## Vue d'ensemble
+## Overview
 
-L'architecture utilise un pattern d'orchestration où l'utilisateur interagit avec un **agent unique** (l'orchestrateur) qui délègue chaque tâche à un **agent spécialisé** responsable d'un seul système métier.
+The architecture uses an orchestration pattern where the user interacts with a **single agent** (the orchestrator), which delegates each task to a **specialized agent** responsible for exactly one business system.
 
 ```
                        ┌─────────────────────────────────┐
                        │      maximo_orchestrator        │
-                       │   (Point d'entrée utilisateur)  │
+                       │   (User entry point)            │
                        └────────────────┬────────────────┘
                                         │
         ┌──────────────┬────────────────┼────────────────┬──────────────┐
@@ -19,8 +19,8 @@ L'architecture utilise un pattern d'orchestration où l'utilisateur interagit av
 │ servicenow_  │ │   maximo_    │ │   maximo_    │ │  maximo_   │ │   slack_   │
 │ ITSM_agent   │ │ diagnostic_  │ │  planning_   │ │  stock_    │ │ notifier_  │
 │              │ │    agent     │ │    agent     │ │  agent     │ │   agent    │
-│ Tickets      │ │ Lecture      │ │ Écriture     │ │ Stock &    │ │ Notif.     │
-│ ITSM         │ │ Maximo       │ │ Maximo       │ │ commandes  │ │ équipe     │
+│ ITSM         │ │ Maximo       │ │ Maximo       │ │ Stock &    │ │ Team       │
+│ tickets      │ │ reads        │ │ writes       │ │ orders     │ │ notif.     │
 └──────┬───────┘ └──────┬───────┘ └──────┬───────┘ └─────┬──────┘ └─────┬──────┘
        │                │                │                │              │
        ▼                ▼                ▼                ▼              ▼
@@ -31,181 +31,181 @@ L'architecture utilise un pattern d'orchestration où l'utilisateur interagit av
 └──────────────┘ └──────────────────────────────┘ └────────────┘ └────────────┘
 ```
 
-**Principes** :
-- 1 agent = 1 responsabilité métier
-- 1 agent = 1 système backend
-- Aucun couplage croisé entre agents
-- L'orchestrateur ne fait que router et coordonner — il n'a aucun tool propre
+**Principles**:
+- 1 agent = 1 business responsibility
+- 1 agent = 1 backend system
+- No cross-coupling between agents
+- The orchestrator only routes and coordinates — it has no tools of its own
 
-## Les six agents
+## The six agents
 
 ### 1. `maximo_orchestrator`
 
-**Rôle** : point d'entrée unique de l'utilisateur. Comprend la demande en langage naturel et délègue à l'agent spécialiste pertinent. Conserve le contexte de la conversation (asset en cours, incident, WO, pièce mentionnée) pour éviter à l'utilisateur de répéter.
+**Role**: the user's single entry point. Understands the natural-language request and delegates to the relevant specialist agent. Keeps the conversation context (current asset, incident, WO, part mentioned) so the user never has to repeat themselves.
 
-**Tools** : aucun. L'orchestrateur ne fait que router.
+**Tools**: none. The orchestrator only routes.
 
-**Collaborateurs** :
+**Collaborators**:
 - `servicenow_ITSM_agent`
 - `maximo_diagnostic_agent`
 - `maximo_planning_agent`
 - `maximo_stock_agent`
 - `slack_notifier_agent`
 
-**Logique de routage** :
+**Routing logic**:
 
-| Type de demande | Mots-clés typiques | Agent appelé |
+| Request type | Typical keywords | Agent called |
 |-----------------|--------------------|--------------|
-| Lire un ticket d'incident | "ticket", "INC...", "incident", "de quoi il s'agit" | `servicenow_ITSM_agent` |
-| Lire un asset / une WO / un guide PDF | "interventions", "asset", "guide", "worklog" | `maximo_diagnostic_agent` |
-| Créer une work order | "crée une WO", "ouvre une intervention", "planifie" | `maximo_planning_agent` |
-| Vérifier un stock / commander une pièce | "stock", "disponibilité", "rupture", "commande fournisseur" | `maximo_stock_agent` |
-| Notifier l'équipe d'astreinte | déclenché **automatiquement** par cascade depuis ServiceNow à la clôture | `slack_notifier_agent` |
+| Read an incident ticket | "ticket", "INC...", "incident", "what is it about" | `servicenow_ITSM_agent` |
+| Read an asset / a WO / a PDF guide | "interventions", "asset", "guide", "worklog" | `maximo_diagnostic_agent` |
+| Create a work order | "create a WO", "open an intervention", "schedule" | `maximo_planning_agent` |
+| Check stock / order a part | "stock", "availability", "out of stock", "supplier order" | `maximo_stock_agent` |
+| Notify the on-call team | triggered **automatically** by cascade from ServiceNow on closure | `slack_notifier_agent` |
 
 ### 2. `servicenow_ITSM_agent`
 
-**Rôle** : interagit avec ServiceNow pour la gestion des incidents (lecture et écriture).
+**Role**: interacts with ServiceNow for incident management (read and write).
 
-**Tools** :
-- `get_incident` — récupère les détails d'un incident par son numéro
-- `list_open_incidents` — liste les incidents ouverts
-- `propose_incident_update` — prépare une mise à jour (DRY-RUN)
-- `update_incident` — applique la mise à jour (après confirmation)
+**Tools**:
+- `get_incident` — retrieves an incident's details by number
+- `list_open_incidents` — lists open incidents
+- `propose_incident_update` — prepares an update (DRY-RUN)
+- `update_incident` — applies the update (after confirmation)
 
-**Particularité** : à la clôture d'un incident (état Résolu / Fermé), le tool `update_incident` retourne dans son champ `message` une **directive structurée** demandant à l'orchestrateur de déléguer ensuite à `slack_notifier_agent`. Voir [`patterns.md`](patterns.md) pour le détail du pattern "Tools chaining déclaratif".
+**Specifics**: when an incident is closed (Resolved / Closed state), the `update_incident` tool returns in its `message` field a **structured directive** asking the orchestrator to then delegate to `slack_notifier_agent`. See [`patterns.md`](patterns.md) for the details of the "Declarative tool chaining" pattern.
 
 ### 3. `maximo_diagnostic_agent`
 
-**Rôle** : opérations de **lecture** sur Maximo. Consulte les assets, les work orders, les notes d'intervention et les documents attachés.
+**Role**: **read** operations on Maximo. Looks up assets, work orders, intervention notes and attached documents.
 
-**Tools** :
-- `search_assets_by_keyword` — cherche un asset par mot-clé
-- `get_work_orders_for_asset` — liste des WO d'un asset
-- `get_worklogs_for_workorder` — notes d'intervention d'une WO
-- `list_asset_attachments` — documents attachés à un asset
-- `get_attachment_text` — extrait le contenu textuel d'un PDF / document
+**Tools**:
+- `search_assets_by_keyword` — searches for an asset by keyword
+- `get_work_orders_for_asset` — lists the WOs of an asset
+- `get_worklogs_for_workorder` — intervention notes of a WO
+- `list_asset_attachments` — documents attached to an asset
+- `get_attachment_text` — extracts the text content of a PDF / document
 
-**Cas d'usage** :
-- "Quelles sont les dernières interventions sur l'asset 11430 ?"
-- "Le worklog mentionne la vanne d'admission, que dit le guide à ce sujet ?"
-- "Résume-moi les notes de la WO 1208."
+**Use cases**:
+- "What are the latest interventions on asset 11430?"
+- "The worklog mentions the intake valve, what does the guide say about it?"
+- "Summarize the notes of WO 1208 for me."
 
 ### 4. `maximo_planning_agent`
 
-**Rôle** : opérations d'**écriture** sur Maximo. Crée des work orders correctives ou préventives.
+**Role**: **write** operations on Maximo. Creates corrective or preventive work orders.
 
-**Tools** :
-- `propose_work_order` — prépare une WO (DRY-RUN), retourne un résumé à confirmer
-- `create_work_order` — crée réellement la WO (après confirmation utilisateur)
+**Tools**:
+- `propose_work_order` — prepares a WO (DRY-RUN), returns a summary to confirm
+- `create_work_order` — actually creates the WO (after user confirmation)
 
-**Particularité** : suit strictement le pattern propose / confirm. Voir [`patterns.md`](patterns.md).
+**Specifics**: strictly follows the propose / confirm pattern. See [`patterns.md`](patterns.md).
 
-**Cas d'usage** :
-- "Crée une work order corrective sur l'asset 11430 pour remplacer la vanne d'admission, priorité haute, date cible dans 7 jours."
+**Use cases**:
+- "Create a corrective work order on asset 11430 to replace the intake valve, high priority, target date in 7 days."
 
 ### 5. `maximo_stock_agent`
 
-**Rôle** : gestion d'un système **séparé de Maximo** — le catalogue des pièces de rechange et les commandes fournisseurs (stocké dans Supabase). C'est le système qui matérialise l'ERP de stock.
+**Role**: manages a system **separate from Maximo** — the spare parts catalog and supplier orders (stored in Supabase). This is the system that embodies the inventory ERP.
 
-**Tools** :
-- `get_spare_part` — consultation d'une pièce par référence
-- `list_low_stock_parts` — pièces en rupture (stock ≤ min_stock)
-- `list_orders_for_part` — historique des commandes d'une pièce
-- `propose_supplier_order` — propose une commande fournisseur (DRY-RUN)
-- `create_supplier_order` — crée réellement la commande (après confirmation)
+**Tools**:
+- `get_spare_part` — looks up a part by reference
+- `list_low_stock_parts` — parts out of stock (stock ≤ min_stock)
+- `list_orders_for_part` — order history for a part
+- `propose_supplier_order` — proposes a supplier order (DRY-RUN)
+- `create_supplier_order` — actually creates the order (after confirmation)
 
-**Cas d'usage** :
-- "Quelle est la disponibilité de la pièce DRV-100-AS en stock ?"
-- "Passe la commande fournisseur pour 1 unité de DRV-100-AS."
+**Use cases**:
+- "What is the stock availability of part DRV-100-AS?"
+- "Place the supplier order for 1 unit of DRV-100-AS."
 
 ### 6. `slack_notifier_agent`
 
-**Rôle** : envoi de notifications structurées (Slack Block Kit) sur le canal de l'équipe maintenance. Déclenché à la clôture d'un incident ServiceNow via le pattern de tools chaining déclaratif.
+**Role**: sends structured notifications (Slack Block Kit) to the maintenance team channel. Triggered when a ServiceNow incident is closed, via the declarative tool chaining pattern.
 
-**Tools** :
-- `send_incident_summary` — envoie un message Block Kit récapitulant l'incident clôturé, la WO Maximo, la commande fournisseur et les actions menées
+**Tools**:
+- `send_incident_summary` — sends a Block Kit message summarizing the closed incident, the Maximo WO, the supplier order and the actions taken
 
-**Cas d'usage** : aucune intervention humaine directe. L'agent est appelé par l'orchestrateur sur directive de `servicenow_ITSM_agent`.
+**Use cases**: no direct human intervention. The agent is called by the orchestrator on a directive from `servicenow_ITSM_agent`.
 
-## Patterns architecturaux
+## Architectural patterns
 
-Deux patterns clés sous-tendent toute l'architecture. Ils sont documentés en détail dans [`patterns.md`](patterns.md).
+Two key patterns underpin the whole architecture. They are documented in detail in [`patterns.md`](patterns.md).
 
 ### Propose / Confirm
 
-Aucune écriture dans aucun système ne se déclenche sans validation explicite de l'utilisateur. Chaque écriture (création de WO, mise à jour de ticket, clôture, commande fournisseur) est précédée d'un appel à un tool `propose_*` qui retourne un résumé. L'utilisateur confirme par "oui" / "confirme", puis et seulement alors le tool `*_create` ou `update_*` est appelé.
+No write to any system is triggered without explicit validation from the user. Every write (WO creation, ticket update, closure, supplier order) is preceded by a call to a `propose_*` tool that returns a summary. The user confirms with "yes" / "confirm", and only then is the `*_create` or `update_*` tool called.
 
-### Tools Chaining déclaratif
+### Declarative Tool Chaining
 
-Quand un tool exécute une écriture qui doit déclencher un effet de bord (par exemple : notification Slack à la clôture d'incident), le tool retourne dans sa réponse une **directive structurée** que l'orchestrateur lit et exécute. C'est plus fiable qu'une règle dans le prompt système, qui peut être ignorée par le LLM.
+When a tool performs a write that must trigger a side effect (for example: a Slack notification on incident closure), the tool returns in its response a **structured directive** that the orchestrator reads and executes. This is more reliable than a rule in the system prompt, which the LLM can ignore.
 
-## Workflows de référence
+## Reference workflows
 
-### Workflow A — Consultation simple
+### Workflow A — Simple lookup
 
 ```
-Utilisateur → Orchestrateur → Agent spécialiste → Réponse
+User → Orchestrator → Specialist agent → Response
 ```
 
-Exemple : "Quelles sont les dernières interventions sur l'asset 11430 ?"
+Example: "What are the latest interventions on asset 11430?"
 
-→ orchestrateur délègue à `maximo_diagnostic_agent`
+→ the orchestrator delegates to `maximo_diagnostic_agent`
 → `get_work_orders_for_asset(assetnum="11430")`
-→ liste des WO formatée et retournée à l'utilisateur
+→ formatted list of WOs returned to the user
 
-### Workflow B — Création avec validation
-
-```
-Utilisateur → Orchestrateur → Agent spécialiste → propose_* → Confirmation utilisateur → create_* → Confirmation système
-```
-
-Exemple : "Passe la commande fournisseur pour 1 unité de DRV-100-AS."
-
-→ orchestrateur délègue à `maximo_stock_agent`
-→ `propose_supplier_order` : résumé avec prix, délai, fournisseur, date de livraison
-→ utilisateur : "oui, confirme"
-→ `create_supplier_order` : commande créée avec id, status PENDING
-
-### Workflow C — Cross-système avec cascade automatique
-
-C'est le workflow phare de la démo. Toutes les écritures et la cascade Slack sont enchaînées par l'orchestrateur sur la base d'une seule conversation utilisateur :
+### Workflow B — Creation with validation
 
 ```
-1. Utilisateur lit l'incident INC0010003 (servicenow_ITSM_agent)
-2. Utilisateur consulte l'historique de l'asset 11430 (maximo_diagnostic_agent)
-3. Utilisateur consulte le guide PDF de l'asset (maximo_diagnostic_agent)
-4. Utilisateur vérifie le stock de DRV-100-AS (maximo_stock_agent)
-5. Utilisateur passe la commande (propose + confirm + create — maximo_stock_agent)
-6. Utilisateur crée la WO corrective sur l'asset (propose + confirm + create — maximo_planning_agent)
-7. Utilisateur ajoute une note de progression au ticket (propose + confirm — servicenow_ITSM_agent)
-8. Utilisateur clôture le ticket (propose + confirm + update — servicenow_ITSM_agent)
-   ↓ Le tool update_incident détecte une clôture et retourne une directive
-   ↓ ATTENTION ORCHESTRATEUR — ACTION RESTANTE OBLIGATOIRE
-9. L'orchestrateur lit la directive et délègue à slack_notifier_agent
-10. slack_notifier_agent envoie le message Block Kit récapitulatif
+User → Orchestrator → Specialist agent → propose_* → User confirmation → create_* → System confirmation
 ```
 
-Le scénario complet en 12 questions (avec les énoncés exacts à utiliser pour rejouer la démo) est dans [`scenario-demo.md`](scenario-demo.md).
+Example: "Place the supplier order for 1 unit of DRV-100-AS."
 
-## Configuration LLM
+→ the orchestrator delegates to `maximo_stock_agent`
+→ `propose_supplier_order`: summary with price, lead time, supplier, delivery date
+→ user: "yes, confirm"
+→ `create_supplier_order`: order created with id, status PENDING
 
-Tous les agents utilisent le même modèle en démo : `groq/openai/gpt-oss-120b`.
+### Workflow C — Cross-system with automatic cascade
 
-Pour changer le LLM, modifier le champ `llm:` dans chaque fichier `agents/*.yaml`. L'architecture est indépendante du LLM — Granite, Llama, Mistral et Claude fonctionnent aussi.
+This is the demo's flagship workflow. All writes and the Slack cascade are chained by the orchestrator from a single user conversation:
 
-**Configuration Chain of Thought** :
-- `enable_cot: true` sur l'orchestrateur (raisonnement de routage)
-- `enable_cot: true` sur `maximo_stock_agent` et `servicenow_ITSM_agent` (pattern propose / confirm complexe)
-- `enable_cot: false` sur les agents purement consultatifs (réponses plus directes)
+```
+1. User reads incident INC0010003 (servicenow_ITSM_agent)
+2. User looks up the history of asset 11430 (maximo_diagnostic_agent)
+3. User looks up the asset's PDF guide (maximo_diagnostic_agent)
+4. User checks the stock of DRV-100-AS (maximo_stock_agent)
+5. User places the order (propose + confirm + create — maximo_stock_agent)
+6. User creates the corrective WO on the asset (propose + confirm + create — maximo_planning_agent)
+7. User adds a progress note to the ticket (propose + confirm — servicenow_ITSM_agent)
+8. User closes the ticket (propose + confirm + update — servicenow_ITSM_agent)
+   ↓ The update_incident tool detects a closure and returns a directive
+   ↓ ORCHESTRATOR ATTENTION — MANDATORY REMAINING ACTION
+9. The orchestrator reads the directive and delegates to slack_notifier_agent
+10. slack_notifier_agent sends the Block Kit summary message
+```
 
-## Évolutions possibles
+The full 12-question scenario (with the exact prompts to use to replay the demo) is in [`scenario-demo.md`](scenario-demo.md).
 
-L'architecture est conçue pour scaler horizontalement. Ajouter un nouveau système (Teams, SAP PM, Workday, etc.) consiste à :
+## LLM configuration
 
-1. Créer une connection WXO vers le nouveau système (ApiKey, OAuth, etc.)
-2. Écrire les tools Python qui exposent les opérations métier
-3. Créer un nouvel agent spécialiste qui possède ces tools et ses propres instructions
-4. Ajouter cet agent dans la liste `collaborators:` de l'orchestrateur
-5. Ajouter la règle de routage correspondante dans les instructions de l'orchestrateur
+All agents use the same model in the demo: `groq/openai/gpt-oss-120b`.
 
-Aucun agent existant n'a besoin d'être modifié.
+To change the LLM, edit the `llm:` field in each `agents/*.yaml` file. The architecture is LLM-agnostic — Granite, Llama, Mistral and Claude work too.
+
+**Chain of Thought configuration**:
+- `enable_cot: true` on the orchestrator (routing reasoning)
+- `enable_cot: true` on `maximo_stock_agent` and `servicenow_ITSM_agent` (complex propose / confirm pattern)
+- `enable_cot: false` on the read-only agents (more direct answers)
+
+## Possible extensions
+
+The architecture is designed to scale horizontally. Adding a new system (Teams, SAP PM, Workday, etc.) consists of:
+
+1. Creating a WXO connection to the new system (ApiKey, OAuth, etc.)
+2. Writing the Python tools that expose the business operations
+3. Creating a new specialist agent that owns these tools and its own instructions
+4. Adding this agent to the orchestrator's `collaborators:` list
+5. Adding the corresponding routing rule to the orchestrator's instructions
+
+No existing agent needs to be modified.

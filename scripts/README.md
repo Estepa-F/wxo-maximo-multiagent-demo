@@ -1,52 +1,52 @@
 # Scripts
 
-Ce dossier contient les scripts shell utilisés pour configurer les connexions, importer les composants et déployer le projet dans watsonx Orchestrate.
+This folder contains the shell scripts used to configure the connections, import the components and deploy the project to watsonx Orchestrate.
 
-## Utilité des scripts
+## Purpose of the scripts
 
-Les scripts servent à automatiser les opérations répétitives du projet. Ils évitent de rejouer manuellement de longues suites de commandes CLI pour configurer les connexions, importer les tools et publier les agents.
+The scripts automate the project's repetitive operations. They avoid manually replaying long sequences of CLI commands to configure the connections, import the tools and publish the agents.
 
-Les scripts permettent notamment de :
-- configurer les connexions aux systèmes externes
-- importer ou réimporter les tools Python
-- importer les agents dans le bon ordre
-- déployer l'ensemble du projet plus rapidement
-- réduire les erreurs manuelles pendant la mise en place
+In particular, the scripts make it possible to:
+- configure the connections to external systems
+- import or re-import the Python tools
+- import the agents in the right order
+- deploy the whole project faster
+- reduce manual errors during setup
 
-## Fichiers présents dans ce dossier
+## Files in this folder
 
 ### [`configure_maximo_connection.sh`](configure_maximo_connection.sh)
-Configure la connexion Maximo dans watsonx Orchestrate.
+Configures the Maximo connection in watsonx Orchestrate.
 
 ### [`configure_servicenow_connection.sh`](configure_servicenow_connection.sh)
-Configure la connexion ServiceNow dans watsonx Orchestrate.
+Configures the ServiceNow connection in watsonx Orchestrate.
 
 ### [`configure_supabase_connection.sh`](configure_supabase_connection.sh)
-Configure la connexion Supabase dans watsonx Orchestrate.
+Configures the Supabase connection in watsonx Orchestrate.
 
 ### [`create_connections.sh`](create_connections.sh)
-Importe puis configure l'ensemble des connexions du projet.
+Imports and then configures all of the project's connections.
 
 ### [`reimport_maximo_tools.sh`](reimport_maximo_tools.sh)
-Réimporte les tools Maximo avec la bonne connexion.
+Re-imports the Maximo tools with the right connection.
 
 ### [`import_supabase_tools.sh`](import_supabase_tools.sh)
-Importe les tools Supabase.
+Imports the Supabase tools.
 
 ### [`import_all_agents.sh`](import_all_agents.sh)
-Importe les agents principaux du projet dans le bon ordre.
+Imports the project's main agents in the right order.
 
 ### [`deploy_complete.sh`](deploy_complete.sh)
-Lance le déploiement complet du projet : connexions, tools et agents.
+Runs the full deployment of the project: connections, tools and agents.
 
-## En pratique
+## In practice
 
-Ce dossier regroupe donc la couche d'automatisation opérationnelle du projet. Ces scripts s'appuient principalement sur le CLI `orchestrate` pour exécuter les tâches de configuration et de déploiement.
+This folder therefore holds the project's operational automation layer. These scripts rely mainly on the `orchestrate` CLI to run the configuration and deployment tasks.
 
-Cette organisation permet de séparer clairement :
-- la configuration d'accès dans [`connections/`](../connections/)
-- la logique technique d'intégration dans [`tools/`](../tools/)
-- la logique conversationnelle dans [`agents/`](../agents/)
-- l'automatisation des opérations dans ce dossier
+This organization makes it possible to clearly separate:
+- access configuration in [`connections/`](../connections/)
+- the technical integration logic in [`tools/`](../tools/)
+- the conversational logic in [`agents/`](../agents/)
+- operational automation in this folder
 
-Le résultat est un projet plus simple à installer, plus cohérent à déployer et plus facile à maintenir.
+The result is a project that is simpler to install, more consistent to deploy and easier to maintain.
